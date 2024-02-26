@@ -1,0 +1,41 @@
+server:
+  port: 8002
+spring:
+  application:
+    name: flying-bicycle
+  profiles:
+    active: dev
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${flying.datasource.url}
+    username: ${flying.datasource.username}
+    password: ${flying.datasource.password}
+  mail:
+    host: smtp.163.com
+    port: 465
+    username: ${flying.mail.username}
+    password: ${flying.mail.password}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.starttls.required: true
+      mail.smtp.socketFactory.port: 465
+      mail.smtp.socketFactory.class: javax.net.ssl.SSLSocketFactory
+      mail.smtp.socketFactory.fallback: false
+      mail.smtp.connectiontimeout: 8000
+      mail.smtp.timeout: 8000
+      mail.smtp.writetimeout: 8000
+  data:
+    redis:
+      host: ${flying.redis.host}
+      port: ${flying.redis.port}
+
+
+
+
+
+mybatis:
+  mapper-locations: classpath:/mybatis/mapper/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
