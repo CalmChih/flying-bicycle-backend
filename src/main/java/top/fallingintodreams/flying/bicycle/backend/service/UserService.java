@@ -12,7 +12,9 @@ import top.fallingintodreams.flying.bicycle.backend.dto.UserAccountDTO;
 public interface UserService {
     /**
      * 插入必要的用户信息，注册时使用
+     *
      * @param userAccountDTO 用户账户信息
+     * @return
      */
-    void registerAccount(UserAccountDTO userAccountDTO);
+    Long registerAccount(UserAccountDTO userAccountDTO);
 }

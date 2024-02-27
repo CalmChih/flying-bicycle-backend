@@ -23,7 +23,7 @@ public interface IUserAccountDao {
      * @param userAccountDTO 登录信息
      * @return 账户id
      */
-    Long getUserAccountByPassword(UserAccountDTO userAccountDTO);
+    UserAccount getAccountIdAndPassword(UserAccountDTO userAccountDTO);
 
     /**
      * 是否存在账户

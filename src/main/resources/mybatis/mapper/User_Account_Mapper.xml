@@ -17,12 +17,11 @@
         VALUES (#{username}, #{password}, #{userId}, #{state}, now(), now())
     </insert>
 
-    <select id="getUserAccountByPassword" parameterType="top.fallingintodreams.flying.bicycle.backend.dto.UserAccountDTO"
-            resultType="long">
-        SELECT id
+    <select id="getAccountIdAndPassword" parameterType="top.fallingintodreams.flying.bicycle.backend.dto.UserAccountDTO"
+            resultType="top.fallingintodreams.flying.bicycle.backend.po.UserAccount">
+        SELECT id, password
         FROM user_account
         WHERE username = #{username}
-          and password = #{password}
           and state = 1
     </select>
 

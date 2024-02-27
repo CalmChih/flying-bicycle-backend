@@ -19,15 +19,15 @@ public class ApiResponse<T> implements Serializable {
     @Serial
     private static final long serialVersionUID = 2633609520611856010L;
 
-    private int code;
+    private String code;
     private String msg;
     private T data;
 
-    public ApiResponse(int responseCode, String msg) {
+    public ApiResponse(String responseCode, String msg) {
         this(responseCode, null, msg);
     }
 
-    public ApiResponse(int responseCode, T data, String msg) {
+    public ApiResponse(String responseCode, T data, String msg) {
         this.code = responseCode;
         this.data = data;
         this.msg = msg;
@@ -61,12 +61,8 @@ public class ApiResponse<T> implements Serializable {
         return new ApiResponse<T>(responseCode.getCode(), data, msg);
     }
 
-    public static ApiResponse error(ResponseCodeEnum responseCode) {
-        return new ApiResponse<>(responseCode.getCode(), responseCode.getMsg());
-    }
-
-    public static ApiResponse error(String msg) {
-        return new ApiResponse<>(ResponseCodeEnum.FAIL.getCode(), msg);
+    public static ApiResponse error(String code, String msg) {
+        return new ApiResponse<>(code, msg);
     }
 
 }

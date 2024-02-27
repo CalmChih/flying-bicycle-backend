@@ -12,11 +12,18 @@ public interface UserAccountService {
 
     /**
      * 是否存在账户
+     *
      * @param userAccountDTO 用户账户信息
-     * @return true 存在
+     * @return
      */
-    boolean loginWithPassword(UserAccountDTO userAccountDTO);
+    Long loginWithPassword(UserAccountDTO userAccountDTO);
 
-    boolean loginWithCaptcha(UserAccountDTO userAccountDTO);
+    /**
+     * 验证码登录
+     *
+     * @param userAccountDTO
+     * @return
+     */
+    Long loginWithCaptcha(UserAccountDTO userAccountDTO);
 
 }

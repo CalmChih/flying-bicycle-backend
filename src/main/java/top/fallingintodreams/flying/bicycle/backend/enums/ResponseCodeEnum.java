@@ -10,29 +10,29 @@ public enum ResponseCodeEnum {
     /**
      * 成功
      */
-    SUCCESS(200, "成功"),
+    SUCCESS("200", "成功"),
     /**
      * 失败
      */
-    FAIL(400, "失败"),
+    FAIL("400", "失败"),
     /**
      * 用户未登录
      */
-    UNAUTHORIZED(401, "未认证"),
+    UNAUTHORIZED("401", "未认证"),
     /**
      * 未知异常
      */
-    INTERNAL_SERVER_ERROR(500, "服务器内部错误");
+    INTERNAL_SERVER_ERROR("500", "服务器内部错误，请稍后再试");
 
-    private final int code;
+    private final String code;
     private final String msg;
 
-    private ResponseCodeEnum(int code, String msg) {
+    private ResponseCodeEnum(String code, String msg) {
         this.code = code;
         this.msg = msg;
     }
 
-    public int getCode() {
+    public String getCode() {
         return this.code;
     }
 
