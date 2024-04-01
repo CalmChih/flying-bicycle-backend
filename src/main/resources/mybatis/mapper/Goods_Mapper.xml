@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.fallingintodreams.flying.bicycle.backend.dao.IGoodsDao">
+    <resultMap id="goodsMap" type="top.fallingintodreams.flying.bicycle.backend.po.Goods">
+        <id column="id" property="id"/>
+        <result column="goods_id" property="goodsId"/>
+        <result column="goods_title" property="goodsTitle"/>
+        <result column="goods_desc" property="goodsDesc"/>
+        <result column="goods_num" property="goodsNum"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="goods_tags" property="goodsTags"/>
+        <result column="goods_img" property="goodsImg"/>
+        <result column="state" property="state"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <insert id="insertGoods" parameterType="top.fallingintodreams.flying.bicycle.backend.po.Goods">
+        INSERT INTO goods (goods_id, goods_title, goods_desc, goods_num, category_id, goods_tags, goods_img, create_time, update_time)
+        VALUES (#{goodsId}, #{goodsTitle}, #{goodsDesc}, #{goodsNum}, #{categoryId}, #{goodsTags}, #{goodsImg}, NOW(), NOW())
+    </insert>
+
+    <update id="updateGoods" parameterType="top.fallingintodreams.flying.bicycle.backend.po.Goods">
+        UPDATE goods
+        <set>
+            <if test="goodsTitle != null and goodsTitle != ''">
+                goods_title = #{goodsTitle},
+            </if>
+            <if test="goodsDesc != null and goodsDesc != ''">
+                goods_desc = #{goodsDesc},
+            </if>
+            <if test="goodsNum != null and goodsNum != ''">
+                goods_num = #{goodsNum},
+            </if>
+            <if test="categoryId != null and categoryId != ''">
+                category_id = #{categoryId},
+            </if>
+            <if test="goodsTags != null and goodsTags != ''">
+                goods_tags = #{goodsTags},
+            </if>
+            <if test="goodsImg != null and goodsImg != ''">
+                goods_img = #{goodsImg},
+            </if>
+            <if test="state != null and state != ''">
+                state = #{state}
+            </if>
+        </set>
+        WHERE goods_id = #{goodsId}
+    </update>
+
+    <select id="getGoodsList" resultMap="goodsMap">
+        SELECT goods_id, goods_title, goods_desc, goods_num, category_id, goods_tags, goods_img, state
+        FROM goods
+        ORDER BY id
+    </select>
+
+    <select id="getGoodsTotal" resultType="integer">
+        SELECT COUNT(*)
+        FROM goods
+    </select>
+
+    <select id="getGoodsInfo" resultMap="goodsMap">
+        SELECT goods_id, goods_title, goods_desc, goods_num, category_id, goods_tags, goods_img, state
+        FROM goods
+        WHERE goods_title LIKE CONCAT('%', #{goodsTitle}, '%')
+    </select>
+
+</mapper>

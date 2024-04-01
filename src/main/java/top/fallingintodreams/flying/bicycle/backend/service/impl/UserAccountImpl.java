@@ -4,7 +4,7 @@ import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Repository;
-import top.fallingintodreams.flying.bicycle.backend.common.Constans;
+import top.fallingintodreams.flying.bicycle.backend.common.Constant;
 import top.fallingintodreams.flying.bicycle.backend.dao.IUserAccountDao;
 import top.fallingintodreams.flying.bicycle.backend.dto.UserAccountDTO;
 import top.fallingintodreams.flying.bicycle.backend.handler.enums.impl.LoginEnum;
@@ -13,7 +13,7 @@ import top.fallingintodreams.flying.bicycle.backend.po.UserAccount;
 import top.fallingintodreams.flying.bicycle.backend.service.UserAccountService;
 import top.fallingintodreams.flying.bicycle.backend.service.UserService;
 import top.fallingintodreams.flying.bicycle.backend.util.RedisUtil;
-import top.fallingintodreams.flying.bicycle.backend.util.RegexUtils;
+import top.fallingintodreams.flying.bicycle.backend.util.RegexUtil;
 
 /**
  * 用户账户 服务实现类
@@ -53,10 +53,10 @@ public class UserAccountImpl implements UserAccountService {
     public Long loginWithCaptcha(UserAccountDTO userAccountDTO) {
         // 验证码格式错误
         if (StringUtils.isNotBlank(userAccountDTO.getCaptcha())
-                && !RegexUtils.matchCaptcha(userAccountDTO.getCaptcha())) {
+                && !RegexUtil.matchCaptcha(userAccountDTO.getCaptcha())) {
             throw new LoginException(LoginEnum.CAPTCHA_ERROR);
         }
-        String captcha = (String) redisUtil.get(Constans.RedisKey.CAPTCHA_KEY_PREFIX(userAccountDTO.getUsername()));
+        String captcha = (String) redisUtil.get(Constant.RedisKey.CAPTCHA_KEY_PREFIX(userAccountDTO.getUsername()));
         // 验证码不匹配
         if (!userAccountDTO.getCaptcha().equals(captcha)) {
             throw new LoginException(LoginEnum.CAPTCHA_ERROR);
@@ -65,7 +65,7 @@ public class UserAccountImpl implements UserAccountService {
         if (accountId == null) {
             accountId = userService.registerAccount(userAccountDTO);
         }
-        redisUtil.del(Constans.RedisKey.CAPTCHA_KEY_PREFIX(userAccountDTO.getUsername()));
+        redisUtil.del(Constant.RedisKey.CAPTCHA_KEY_PREFIX(userAccountDTO.getUsername()));
         return accountId;
     }
 }

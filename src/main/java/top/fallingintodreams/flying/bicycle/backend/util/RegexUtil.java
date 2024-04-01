@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
  * @author Chih
  * @date 2024/2/26 21:44
  */
-public class RegexUtils {
+public class RegexUtil {
 
     public static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$";
     public static final String CAPTCHA_REGEX = "^\\d{6}$";

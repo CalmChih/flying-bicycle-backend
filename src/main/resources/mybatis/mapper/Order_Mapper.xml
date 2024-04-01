@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.fallingintodreams.flying.bicycle.backend.dao.IOrderDao">
+    <resultMap id="orderMap" type="top.fallingintodreams.flying.bicycle.backend.po.Order">
+        <id column="id" property="id"/>
+        <result column="account_id" property="accountId"/>
+        <result column="num" property="num"/>
+        <result column="reservation_start_time" property="reservationStartTime"/>
+        <result column="reservation_end_time" property="reservationEndTime"/>
+        <result column="pay_time" property="payTime"/>
+        <result column="order_state" property="orderState"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <insert id="insertOrder" parameterType="top.fallingintodreams.flying.bicycle.backend.po.Order">
+        INSERT INTO order (account_id, num, reservation_start_time, reservation_end_time, create_time, update_time)
+        VALUES (#{accountId}, #{num}, #{reservationStartTime}, #{reservationEndTime}, NOW(), NOW())
+    </insert>
+
+    <update id="updateOrder" parameterType="top.fallingintodreams.flying.bicycle.backend.po.Order">
+        UPDATE order
+        <set>
+            update_time = NOW()
+            <if test="payTime != null">
+                pay_time = #{payTime}
+            </if>
+            <if test="orderState != null">
+                order_state = #{orderState}
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <select id="getOrderList" parameterType="long" resultMap="orderMap">
+        SELECT id,
+               num,
+               reservation_start_time,
+               reservation_end_time,
+               pay_time,
+               order_state,
+               create_time
+        FROM order
+        WHERE account_id = #{accountId}
+    </select>
+
+    <select id="getOrderInfo" parameterType="top.fallingintodreams.flying.bicycle.backend.po.Order"
+            resultMap="orderMap">
+        SELECT num,
+               reservation_start_time,
+               reservation_end_time,
+               pay_time,
+               order_state,
+               create_time
+        FROM order
+        WHERE id = #{id}
+          AND account_id = #{accountId}
+    </select>
+</mapper>

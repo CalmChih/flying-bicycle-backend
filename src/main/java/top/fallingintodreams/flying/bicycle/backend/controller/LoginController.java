@@ -9,15 +9,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import top.fallingintodreams.flying.bicycle.backend.common.ApiResponse;
-import top.fallingintodreams.flying.bicycle.backend.common.Constans;
+import top.fallingintodreams.flying.bicycle.backend.common.Constant;
 import top.fallingintodreams.flying.bicycle.backend.common.EmailService;
 import top.fallingintodreams.flying.bicycle.backend.dto.UserAccountDTO;
 import top.fallingintodreams.flying.bicycle.backend.handler.enums.impl.LoginEnum;
 import top.fallingintodreams.flying.bicycle.backend.handler.exception.LoginException;
 import top.fallingintodreams.flying.bicycle.backend.service.UserAccountService;
-import top.fallingintodreams.flying.bicycle.backend.service.UserService;
 import top.fallingintodreams.flying.bicycle.backend.util.RedisUtil;
-import top.fallingintodreams.flying.bicycle.backend.util.RegexUtils;
+import top.fallingintodreams.flying.bicycle.backend.util.RegexUtil;
 
 /**
  * 用户登录注册Controller
@@ -30,8 +29,6 @@ import top.fallingintodreams.flying.bicycle.backend.util.RegexUtils;
 public class LoginController {
 
     @Resource
-    private UserService userService;
-    @Resource
     private UserAccountService userAccountService;
     @Resource
     private EmailService emailService;
@@ -43,6 +40,9 @@ public class LoginController {
     @PostMapping("/login")
     @Transactional(rollbackFor = RuntimeException.class)
     public ApiResponse registerAndLogin(@RequestBody UserAccountDTO userAccountDTO) {
+        if (StringUtils.isBlank(userAccountDTO.getUsername()) || !RegexUtil.matchEmail(userAccountDTO.getUsername())) {
+            throw new LoginException(LoginEnum.MAIL_FORMAT_ERROR);
+        }
         Long accountId = null;
         if (userAccountDTO.getType() == 1) {
             accountId = userAccountService.loginWithPassword(userAccountDTO);
@@ -54,13 +54,24 @@ public class LoginController {
         return ApiResponse.success(tokenInfo, "登录成功");
     }
 
+    @PostMapping("adminLogin")
+    public ApiResponse adminLogin(@RequestBody UserAccountDTO userAccountDTO) {
+        if (StringUtils.isBlank(userAccountDTO.getUsername()) || !RegexUtil.matchEmail(userAccountDTO.getUsername())) {
+            throw new LoginException(LoginEnum.MAIL_FORMAT_ERROR);
+        }
+        Long accountId = userAccountService.loginWithPassword(userAccountDTO);
+        StpUtil.login(accountId);
+        SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
+        return ApiResponse.success(tokenInfo, "登录成功");
+    }
+
     @GetMapping("/sendCaptcha")
     public ApiResponse senCaptcha(@RequestParam String emailAccount) {
-        if (StringUtils.isBlank(emailAccount) || !RegexUtils.matchEmail(emailAccount)) {
+        if (StringUtils.isBlank(emailAccount) || !RegexUtil.matchEmail(emailAccount)) {
             throw new LoginException(LoginEnum.MAIL_FORMAT_ERROR);
         }
         String captcha = RandomStringUtils.randomNumeric(6);
-        boolean isSuccess = redisUtil.set(Constans.RedisKey.CAPTCHA_KEY_PREFIX(emailAccount), captcha, 60 * 3L);
+        boolean isSuccess = redisUtil.set(Constant.RedisKey.CAPTCHA_KEY_PREFIX(emailAccount), captcha, 60 * 3L);
         if (!isSuccess) {
             throw new LoginException(LoginEnum.CAPTCHA_SEND_ERROR);
         }
@@ -68,11 +79,10 @@ public class LoginController {
         return ApiResponse.success("验证码发送成功：" + captcha);
     }
 
-    @GetMapping("/isLogin")
+    @PostMapping("/logout")
     public ApiResponse isLogin() {
-        boolean login = StpUtil.isLogin();
-        return ApiResponse.success(login ? "已登录" : "未登录");
+        StpUtil.logout();
+        return ApiResponse.success("成功退出登录");
     }
-
 
 }

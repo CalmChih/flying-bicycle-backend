@@ -12,9 +12,10 @@
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
-    <insert id="insertUserAccount" parameterType="top.fallingintodreams.flying.bicycle.backend.po.UserAccount">
-        INSERT INTO user_account (username, password, user_id, state, create_time, update_time)
-        VALUES (#{username}, #{password}, #{userId}, #{state}, now(), now())
+    <insert id="insertUserAccount" parameterType="top.fallingintodreams.flying.bicycle.backend.po.UserAccount"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_account (username, password, user_id, create_time, update_time)
+        VALUES (#{username}, #{password}, #{userId}, now(), now())
     </insert>
 
     <select id="getAccountIdAndPassword" parameterType="top.fallingintodreams.flying.bicycle.backend.dto.UserAccountDTO"

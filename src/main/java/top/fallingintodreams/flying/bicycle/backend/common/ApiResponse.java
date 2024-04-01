@@ -2,7 +2,7 @@ package top.fallingintodreams.flying.bicycle.backend.common;
 
 
 import lombok.Data;
-import top.fallingintodreams.flying.bicycle.backend.enums.ResponseCodeEnum;
+import top.fallingintodreams.flying.bicycle.backend.common.Constant.ResponseCodeEnum;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -14,55 +14,55 @@ import java.io.Serializable;
  * @date 2024/2/25 20:33
  */
 @Data
-public class ApiResponse<T> implements Serializable {
+public class ApiResponse implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 2633609520611856010L;
 
     private String code;
     private String msg;
-    private T data;
+    private Object data;
 
     public ApiResponse(String responseCode, String msg) {
         this(responseCode, null, msg);
     }
 
-    public ApiResponse(String responseCode, T data, String msg) {
+    public ApiResponse(String responseCode, Object data, String msg) {
         this.code = responseCode;
         this.data = data;
         this.msg = msg;
     }
 
     public static ApiResponse success() {
-        return new ApiResponse<>(ResponseCodeEnum.SUCCESS.getCode(), ResponseCodeEnum.SUCCESS.getMsg());
+        return new ApiResponse(ResponseCodeEnum.SUCCESS.getCode(), ResponseCodeEnum.SUCCESS.getMsg());
     }
 
     public static ApiResponse success(ResponseCodeEnum responseCode) {
-        return new ApiResponse<>(responseCode.getCode(), responseCode.getMsg());
+        return new ApiResponse(responseCode.getCode(), responseCode.getMsg());
     }
 
     public static ApiResponse success(String msg) {
-        return new ApiResponse<>(ResponseCodeEnum.SUCCESS.getCode(), msg);
+        return new ApiResponse(ResponseCodeEnum.SUCCESS.getCode(), msg);
     }
 
-    public static <T> ApiResponse<T> success(T data) {
-        return new ApiResponse<T>(ResponseCodeEnum.SUCCESS.getCode(), data, ResponseCodeEnum.SUCCESS.getMsg());
+    public static ApiResponse success(Object data) {
+        return new ApiResponse(ResponseCodeEnum.SUCCESS.getCode(), data, ResponseCodeEnum.SUCCESS.getMsg());
     }
 
-    public static <T> ApiResponse<T> success(T data, String msg) {
-        return new ApiResponse<T>(ResponseCodeEnum.SUCCESS.getCode(), data, msg);
+    public static ApiResponse success(Object data, String msg) {
+        return new ApiResponse(ResponseCodeEnum.SUCCESS.getCode(), data, msg);
     }
 
-    public static <T> ApiResponse<T> success(ResponseCodeEnum responseCode, T data) {
-        return new ApiResponse<T>(responseCode.getCode(), data, responseCode.getMsg());
+    public static ApiResponse success(ResponseCodeEnum responseCode, Object data) {
+        return new ApiResponse(responseCode.getCode(), data, responseCode.getMsg());
     }
 
-    public static <T> ApiResponse<T> success(ResponseCodeEnum responseCode, T data, String msg) {
-        return new ApiResponse<T>(responseCode.getCode(), data, msg);
+    public static ApiResponse success(ResponseCodeEnum responseCode, Object data, String msg) {
+        return new ApiResponse(responseCode.getCode(), data, msg);
     }
 
     public static ApiResponse error(String code, String msg) {
-        return new ApiResponse<>(code, msg);
+        return new ApiResponse(code, msg);
     }
 
 }

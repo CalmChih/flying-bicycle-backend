@@ -5,7 +5,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import top.fallingintodreams.flying.bicycle.backend.common.Constans;
 import top.fallingintodreams.flying.bicycle.backend.dao.IUserAccountDao;
 import top.fallingintodreams.flying.bicycle.backend.dao.IUserDao;
 import top.fallingintodreams.flying.bicycle.backend.dto.UserAccountDTO;
@@ -32,14 +31,12 @@ public class UserServiceImpl implements UserService {
     public Long registerAccount(UserAccountDTO userAccountDTO) {
         User user = new User();
         user.setNickname(RandomStringUtils.randomAlphanumeric(8));
-        user.setState(Constans.UserState.NORMAL);
         userDao.insertUserInfo(user);
         UserAccount userAccount = new UserAccount();
         userAccount.setUsername(userAccountDTO.getUsername());
         userAccount.setPassword(BCrypt.hashpw(RandomStringUtils.randomAlphanumeric(12), BCrypt.gensalt()));
         userAccount.setUserId(user.getId());
-        userAccount.setState(Constans.UserState.NORMAL);
         userAccountDao.insertUserAccount(userAccount);
-        return user.getId();
+        return userAccount.getId();
     }
 }
