@@ -49,21 +49,18 @@
         WHERE goods_id = #{goodsId}
     </update>
 
-    <select id="getGoodsList" resultMap="goodsMap">
+    <select id="getGoodsList" parameterType="hashmap" resultMap="goodsMap">
         SELECT goods_id, goods_title, goods_desc, goods_num, category_id, goods_tags, goods_img, state
         FROM goods
+        WHERE state != 3
+        <if test="goodsTitle != '' and goodsTitle != null">
+            AND goods_title LIKE CONCAT('%', #{goodsTitle}, '%')
+        </if>
         ORDER BY id
     </select>
 
-    <select id="getGoodsTotal" resultType="integer">
-        SELECT COUNT(*)
-        FROM goods
-    </select>
-
-    <select id="getGoodsInfo" resultMap="goodsMap">
-        SELECT goods_id, goods_title, goods_desc, goods_num, category_id, goods_tags, goods_img, state
-        FROM goods
-        WHERE goods_title LIKE CONCAT('%', #{goodsTitle}, '%')
-    </select>
+    <update id="deleteGoods">
+        UPDATE goods SET state = 3 WHERE goods_id = #{goodsId}
+    </update>
 
 </mapper>

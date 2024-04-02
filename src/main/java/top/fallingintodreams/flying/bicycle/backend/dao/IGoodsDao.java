@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.Mapper;
 import top.fallingintodreams.flying.bicycle.backend.po.Goods;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 商品Dao
@@ -29,19 +30,12 @@ public interface IGoodsDao {
      * 获取商品列表 分页
      * @return 商品列表
      */
-    List<Goods> getGoodsList();
+    List<Goods> getGoodsList(Map<String, Object> searchMap);
 
     /**
-     * 获取商品总数
-     * @return 商品总数
+     * 删除商品
+     * @param goodsId 商品id
      */
-    Integer getGoodsTotal();
-
-    /**
-     * 获取商品详情
-     * @param goodsTitle 商品名称
-     * @return 商品详情
-     */
-    List<Goods> getGoodsInfo(String goodsTitle);
+    void deleteGoods(Long goodsId);
 
 }
