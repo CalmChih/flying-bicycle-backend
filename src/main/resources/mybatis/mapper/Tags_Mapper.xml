@@ -11,8 +11,28 @@
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
-    <select id="getTagList" resultMap="tagsMap">
+    <select id="getTagList" parameterType="hashmap" resultMap="tagsMap">
         SELECT tag_id, tag_name FROM tags WHERE state = 1
+        <if test="tagName != '' and tagName != null">
+            AND tag_name LIKE CONCAT('%', #{tagName}, '%')
+        </if>
     </select>
+
+    <update id="deleteTag" parameterType="long">
+        UPDATE tags
+        SET state = 2
+        WHERE tag_id = #{tagId}
+    </update>
+
+    <update id="updateTag">
+        UPDATE tags
+        SET tag_name = #{tagName}
+        WHERE tag_id = #{tagId}
+    </update>
+
+    <insert id="insertTag" parameterType="top.fallingintodreams.flying.bicycle.backend.po.Tags">
+        INSERT INTO tags (tag_id, tag_name, create_time, update_time)
+        VALUES (#{tagId}, #{tagName}, NOW(), NOW())
+    </insert>
 
 </mapper>

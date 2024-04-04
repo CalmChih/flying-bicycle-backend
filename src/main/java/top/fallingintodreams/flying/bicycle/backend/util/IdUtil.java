@@ -29,4 +29,8 @@ public class IdUtil {
     public static Integer generateCategoryId() {
         return RandomUtil.randomInt(10000, 100000, true, false);
     }
+
+    public static Long generateTagId() {
+        return RandomUtil.randomLong(10000000, 100000000, true, false);
+    }
 }
