@@ -1,5 +1,7 @@
 package top.fallingintodreams.flying.bicycle.backend.util;
 
+import cn.hutool.core.util.RandomUtil;
+
 import java.util.Calendar;
 import java.util.Random;
 
@@ -22,5 +24,9 @@ public class IdUtil {
         idStr.append(String.format("%03d", new Random().nextInt(1000)));
 
         return Long.parseLong(idStr.toString());
+    }
+
+    public static Integer generateCategoryId() {
+        return RandomUtil.randomInt(10000, 100000, true, false);
     }
 }

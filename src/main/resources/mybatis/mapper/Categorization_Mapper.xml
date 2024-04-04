@@ -11,8 +11,26 @@
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
-    <select id="getCategoryList" resultMap="categoryMap">
-        SELECT category_id, category_name FROM categorization WHERE state = 1
+    <select id="getCategoryList" parameterType="hashmap" resultMap="categoryMap">
+        SELECT category_id, category_name
+        FROM categorization
+        WHERE state = 1
+        <if test="categoryName != '' and categoryName != null">
+            AND category_name LIKE CONCAT('%', #{categoryName}, '%')
+        </if>
     </select>
+
+    <update id="deleteCategory" parameterType="integer">
+        UPDATE categorization SET state = 2 WHERE category_id = #{categoryId}
+    </update>
+
+    <update id="updateCategory">
+        UPDATE categorization SET category_name = #{categoryName} WHERE category_id = #{categoryId}
+    </update>
+
+    <insert id="insertCategory" parameterType="top.fallingintodreams.flying.bicycle.backend.po.Categorization">
+        INSERT INTO categorization (category_id, category_name, create_time, update_time)
+        VALUES (#{categoryId}, #{categoryName}, NOW(), NOW())
+    </insert>
 
 </mapper>
