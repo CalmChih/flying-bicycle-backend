@@ -1,6 +1,7 @@
 package top.fallingintodreams.flying.bicycle.backend.service;
 
 import top.fallingintodreams.flying.bicycle.backend.dto.UserAccountDTO;
+import top.fallingintodreams.flying.bicycle.backend.po.User;
 
 /**
  *
@@ -14,7 +15,15 @@ public interface UserService {
      * 插入必要的用户信息，注册时使用
      *
      * @param userAccountDTO 用户账户信息
+     */
+    void registerAccount(UserAccountDTO userAccountDTO);
+
+    /**
+     * 获取用户信息
+     * @param username
      * @return
      */
-    Long registerAccount(UserAccountDTO userAccountDTO);
+    User getUserInfo(String username);
+
+    void updateUserInfo(User user);
 }

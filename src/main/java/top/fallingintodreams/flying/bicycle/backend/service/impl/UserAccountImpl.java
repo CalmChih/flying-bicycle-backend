@@ -9,7 +9,6 @@ import top.fallingintodreams.flying.bicycle.backend.dao.IUserAccountDao;
 import top.fallingintodreams.flying.bicycle.backend.dto.UserAccountDTO;
 import top.fallingintodreams.flying.bicycle.backend.handler.enums.impl.LoginEnum;
 import top.fallingintodreams.flying.bicycle.backend.handler.exception.LoginException;
-import top.fallingintodreams.flying.bicycle.backend.po.UserAccount;
 import top.fallingintodreams.flying.bicycle.backend.service.UserAccountService;
 import top.fallingintodreams.flying.bicycle.backend.service.UserService;
 import top.fallingintodreams.flying.bicycle.backend.util.RedisUtil;
@@ -33,24 +32,40 @@ public class UserAccountImpl implements UserAccountService {
 
 
     @Override
-    public Long loginWithPassword(UserAccountDTO userAccountDTO) {
+    public void loginWithPassword(UserAccountDTO userAccountDTO) {
         // 账号或密码为空
         if (StringUtils.isBlank(userAccountDTO.getUsername()) || StringUtils.isBlank(userAccountDTO.getPassword())) {
             throw new LoginException(LoginEnum.WRONG_ACCOUNT_NUMBER_OR_PASSWORD);
         }
-        UserAccount userAccount = userAccountDao.getAccountIdAndPassword(userAccountDTO);
-        if (StringUtils.isBlank(userAccount.getPassword())) {
+        String password = userAccountDao.getPassword(userAccountDTO);
+        if (StringUtils.isBlank(password)) {
             throw new LoginException(LoginEnum.ACCOUNT_DOES_NOT_EXIST);
         }
-        boolean flag = BCrypt.checkpw(userAccountDTO.getPassword(), userAccount.getPassword());
+        boolean flag = BCrypt.checkpw(userAccountDTO.getPassword(), password);
         if (!flag) {
             throw new LoginException(LoginEnum.WRONG_ACCOUNT_NUMBER_OR_PASSWORD);
         }
-        return userAccount.getId();
     }
 
     @Override
-    public Long loginWithCaptcha(UserAccountDTO userAccountDTO) {
+    public void loginWithCaptcha(UserAccountDTO userAccountDTO) {
+        checkCaptcha(userAccountDTO);
+        int count = userAccountDao.getUserAccount(userAccountDTO);
+        if (count == 0) {
+            userService.registerAccount(userAccountDTO);
+        }
+        redisUtil.del(Constant.RedisKey.CAPTCHA_KEY_PREFIX(userAccountDTO.getUsername()));
+    }
+
+    @Override
+    public void updatePassword(UserAccountDTO userAccountDTO) {
+        checkCaptcha(userAccountDTO);
+        userAccountDTO.setPassword(BCrypt.hashpw(userAccountDTO.getPassword(), BCrypt.gensalt()));
+        userAccountDao.updatePassword(userAccountDTO);
+        redisUtil.del(Constant.RedisKey.CAPTCHA_KEY_PREFIX(userAccountDTO.getUsername()));
+    }
+
+    private void checkCaptcha(UserAccountDTO userAccountDTO) {
         // 验证码格式错误
         if (StringUtils.isNotBlank(userAccountDTO.getCaptcha())
                 && !RegexUtil.matchCaptcha(userAccountDTO.getCaptcha())) {
@@ -61,11 +76,5 @@ public class UserAccountImpl implements UserAccountService {
         if (!userAccountDTO.getCaptcha().equals(captcha)) {
             throw new LoginException(LoginEnum.CAPTCHA_ERROR);
         }
-        Long accountId = userAccountDao.getUserAccount(userAccountDTO);
-        if (accountId == null) {
-            accountId = userService.registerAccount(userAccountDTO);
-        }
-        redisUtil.del(Constant.RedisKey.CAPTCHA_KEY_PREFIX(userAccountDTO.getUsername()));
-        return accountId;
     }
 }

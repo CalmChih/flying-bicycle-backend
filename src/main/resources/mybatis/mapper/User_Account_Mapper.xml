@@ -12,26 +12,31 @@
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
-    <insert id="insertUserAccount" parameterType="top.fallingintodreams.flying.bicycle.backend.po.UserAccount"
-            useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertUserAccount" parameterType="top.fallingintodreams.flying.bicycle.backend.po.UserAccount">
         INSERT INTO user_account (username, password, user_id, create_time, update_time)
         VALUES (#{username}, #{password}, #{userId}, now(), now())
     </insert>
 
-    <select id="getAccountIdAndPassword" parameterType="top.fallingintodreams.flying.bicycle.backend.dto.UserAccountDTO"
-            resultType="top.fallingintodreams.flying.bicycle.backend.po.UserAccount">
-        SELECT id, password
+    <select id="getPassword" parameterType="top.fallingintodreams.flying.bicycle.backend.dto.UserAccountDTO"
+            resultType="string">
+        SELECT password
         FROM user_account
         WHERE username = #{username}
           and state = 1
     </select>
 
     <select id="getUserAccount" parameterType="top.fallingintodreams.flying.bicycle.backend.dto.UserAccountDTO"
-            resultType="long">
-        SELECT id
+            resultType="int">
+        SELECT COUNT(*)
         FROM user_account
         WHERE username = #{username}
           AND state = 1
     </select>
+
+    <update id="updatePassword">
+        UPDATE user_account
+        SET password = #{password}
+        WHERE username = #{username}
+    </update>
 
 </mapper>

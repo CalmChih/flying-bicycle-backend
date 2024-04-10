@@ -18,4 +18,13 @@ public interface IUserDao {
      */
     void insertUserInfo(User user);
 
+    /**
+     * 获取用户信息
+     * @param username
+     * @return
+     */
+    User getUserInfo(String username);
+
+    void updateUserInfo(User user);
+
 }

@@ -6,6 +6,7 @@ import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpUtil;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -22,10 +23,15 @@ public class WebConfig implements WebMvcConfigurer {
         // 注册 Sa-Token 拦截器，校验规则为 StpUtil.checkLogin() 登录校验。
         registry.addInterceptor(new SaInterceptor(handle -> {
                     SaRouter.match(SaHttpMethod.OPTIONS).back();
-                    StpUtil.checkLogin();
+                    StpUtil.isLogin();
                 }))
                 .addPathPatterns("/**")
-                .excludePathPatterns("/login", "/sendCaptcha", "/adminLogin");
+                .excludePathPatterns("/login", "/sendCaptcha", "/adminLogin", "/image/**");
     }
 
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/image/**")
+                .addResourceLocations("file:D:/bishe/flying-bicycle/src/assets/images/");
+    }
 }

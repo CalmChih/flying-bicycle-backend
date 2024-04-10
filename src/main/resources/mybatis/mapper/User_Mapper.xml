@@ -19,4 +19,36 @@
         INSERT INTO user (nickname, create_time, update_time)
         VALUES (#{nickname}, now(), now())
     </insert>
+
+    <select id="getUserInfo" parameterType="string" resultMap="userMap">
+        SELECT u.id, u.nickname, u.gender, u.birthday, u.mobile, u.avatar
+        FROM user u
+                 INNER JOIN user_account a ON u.id = a.user_id
+        WHERE a.username = #{username}
+    </select>
+
+    <update id="updateUserInfo">
+        UPDATE user
+        <set>
+            <if test="nickname != null and nickname != ''">
+                nickname = #{nickname},
+            </if>
+            <if test="gender != null">
+                gender = #{gender},
+            </if>
+            <if test="birthday != null">
+                birthday = #{birthday},
+            </if>
+            <if test="mobile != null and mobile != ''">
+                mobile = #{mobile},
+            </if>
+            <if test="avatar != null and avatar != ''">
+                avatar = #{avatar},
+            </if>
+            <if test="state != null">
+                state = #{state},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
 </mapper>

@@ -14,16 +14,15 @@ public interface UserAccountService {
      * 是否存在账户
      *
      * @param userAccountDTO 用户账户信息
-     * @return
      */
-    Long loginWithPassword(UserAccountDTO userAccountDTO);
+    void loginWithPassword(UserAccountDTO userAccountDTO);
 
     /**
      * 验证码登录
      *
      * @param userAccountDTO
-     * @return
      */
-    Long loginWithCaptcha(UserAccountDTO userAccountDTO);
+    void loginWithCaptcha(UserAccountDTO userAccountDTO);
 
+    void updatePassword(UserAccountDTO userAccountDTO);
 }

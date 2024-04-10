@@ -43,13 +43,12 @@ public class LoginController {
         if (StringUtils.isBlank(userAccountDTO.getUsername()) || !RegexUtil.matchEmail(userAccountDTO.getUsername())) {
             throw new LoginException(LoginEnum.MAIL_FORMAT_ERROR);
         }
-        Long accountId = null;
         if (userAccountDTO.getType() == 1) {
-            accountId = userAccountService.loginWithPassword(userAccountDTO);
+            userAccountService.loginWithPassword(userAccountDTO);
         } else {
-            accountId = userAccountService.loginWithCaptcha(userAccountDTO);
+            userAccountService.loginWithCaptcha(userAccountDTO);
         }
-        StpUtil.login(accountId);
+        StpUtil.login(userAccountDTO.getUsername());
         SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
         return ApiResponse.success(tokenInfo, "登录成功");
     }
@@ -59,8 +58,11 @@ public class LoginController {
         if (StringUtils.isBlank(userAccountDTO.getUsername()) || !RegexUtil.matchEmail(userAccountDTO.getUsername())) {
             throw new LoginException(LoginEnum.MAIL_FORMAT_ERROR);
         }
-        Long accountId = userAccountService.loginWithPassword(userAccountDTO);
-        StpUtil.login(accountId);
+        if (!"admin@123.com".equals(userAccountDTO.getUsername())) {
+            throw new LoginException(LoginEnum.NOT_ADMIN_ACCOUNT);
+        }
+        userAccountService.loginWithPassword(userAccountDTO);
+        StpUtil.login(userAccountDTO.getUsername());
         SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
         return ApiResponse.success(tokenInfo, "登录成功");
     }

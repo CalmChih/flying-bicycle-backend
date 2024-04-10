@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public Long registerAccount(UserAccountDTO userAccountDTO) {
+    public void registerAccount(UserAccountDTO userAccountDTO) {
         User user = new User();
         user.setNickname(RandomStringUtils.randomAlphanumeric(8));
         userDao.insertUserInfo(user);
@@ -37,6 +37,15 @@ public class UserServiceImpl implements UserService {
         userAccount.setPassword(BCrypt.hashpw(RandomStringUtils.randomAlphanumeric(12), BCrypt.gensalt()));
         userAccount.setUserId(user.getId());
         userAccountDao.insertUserAccount(userAccount);
-        return userAccount.getId();
+    }
+
+    @Override
+    public User getUserInfo(String username) {
+        return userDao.getUserInfo(username);
+    }
+
+    @Override
+    public void updateUserInfo(User user) {
+        userDao.updateUserInfo(user);
     }
 }

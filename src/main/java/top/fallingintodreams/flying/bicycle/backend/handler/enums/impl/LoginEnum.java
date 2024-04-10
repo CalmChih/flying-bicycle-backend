@@ -23,6 +23,7 @@ public enum LoginEnum implements IBaseExceptionInfo {
      * 邮箱格式错误
      */
     MAIL_FORMAT_ERROR("104", "邮箱格式错误"),
+    NOT_ADMIN_ACCOUNT("106", "非管理员账户"),
     /**
      * 验证码发送失败
      */

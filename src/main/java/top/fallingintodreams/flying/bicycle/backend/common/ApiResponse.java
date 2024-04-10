@@ -65,4 +65,8 @@ public class ApiResponse implements Serializable {
         return new ApiResponse(code, msg);
     }
 
+    public static ApiResponse error(String msg) {
+        return new ApiResponse(ResponseCodeEnum.FAIL.getCode(), msg);
+    }
+
 }

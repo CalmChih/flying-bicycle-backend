@@ -23,12 +23,14 @@ public interface IUserAccountDao {
      * @param userAccountDTO 登录信息
      * @return 账户id
      */
-    UserAccount getAccountIdAndPassword(UserAccountDTO userAccountDTO);
+    String getPassword(UserAccountDTO userAccountDTO);
 
     /**
      * 是否存在账户
      * @param userAccountDTO 登录信息
      * @return
      */
-    Long getUserAccount(UserAccountDTO userAccountDTO);
+    int getUserAccount(UserAccountDTO userAccountDTO);
+
+    void updatePassword(UserAccountDTO userAccountDTO);
 }
