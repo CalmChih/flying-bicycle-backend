@@ -37,4 +37,6 @@ public interface GoodsService {
      */
     void deleteGoods(Long goodsId);
 
+    Goods getGoodsById(Long goodsId);
+
 }

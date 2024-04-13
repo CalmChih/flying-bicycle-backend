@@ -2,6 +2,7 @@ package top.fallingintodreams.flying.bicycle.backend.po;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -32,6 +33,10 @@ public class Goods {
      * 商品数量
      */
     private Integer goodsNum;
+    /**
+     * 商品金额
+     */
+    private BigDecimal goodsPrice;
     /**
      * 商品分类id
      */

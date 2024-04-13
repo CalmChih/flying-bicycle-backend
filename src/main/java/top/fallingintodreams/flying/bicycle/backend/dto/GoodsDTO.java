@@ -2,6 +2,8 @@ package top.fallingintodreams.flying.bicycle.backend.dto;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class GoodsDTO {
     /**
@@ -20,6 +22,10 @@ public class GoodsDTO {
      * 商品数量
      */
     private Integer goodsNum;
+    /**
+     * 商品金额
+     */
+    private BigDecimal goodsPrice;
     /**
      * 商品分类id
      */

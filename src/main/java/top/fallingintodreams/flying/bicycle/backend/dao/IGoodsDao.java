@@ -38,4 +38,11 @@ public interface IGoodsDao {
      */
     void deleteGoods(Long goodsId);
 
+    /**
+     * 获取商品
+     * @param goodsId
+     * @return
+     */
+    Goods getGoodsById(Long goodsId);
+
 }

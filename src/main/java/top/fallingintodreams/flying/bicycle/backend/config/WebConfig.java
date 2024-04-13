@@ -26,7 +26,8 @@ public class WebConfig implements WebMvcConfigurer {
                     StpUtil.isLogin();
                 }))
                 .addPathPatterns("/**")
-                .excludePathPatterns("/login", "/sendCaptcha", "/adminLogin", "/image/**");
+                .excludePathPatterns("/login", "/sendCaptcha", "/adminLogin", "/image/**", "/category/getCategoryList",
+                        "/tags/getTagList", "/goods/getGoodsList");
     }
 
     @Override

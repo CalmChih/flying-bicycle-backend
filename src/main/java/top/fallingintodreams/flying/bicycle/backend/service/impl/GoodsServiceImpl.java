@@ -72,6 +72,7 @@ public class GoodsServiceImpl implements GoodsService {
         goodsDTO.setGoodsTitle(goodsInfo.getGoodsTitle());
         goodsDTO.setGoodsDesc(goodsInfo.getGoodsDesc());
         goodsDTO.setGoodsNum(goodsInfo.getGoodsNum());
+        goodsDTO.setGoodsPrice(goodsInfo.getGoodsPrice());
         goodsDTO.setCategoryId(goodsInfo.getCategoryId());
         goodsDTO.setCategoryName(categoryMap.get(goodsInfo.getCategoryId()));
         goodsDTO.setGoodsTags(goodsInfo.getGoodsTags());
@@ -84,5 +85,10 @@ public class GoodsServiceImpl implements GoodsService {
     @Override
     public void deleteGoods(Long goodsId) {
         goodsDao.deleteGoods(goodsId);
+    }
+
+    @Override
+    public Goods getGoodsById(Long goodsId) {
+        return goodsDao.getGoodsById(goodsId);
     }
 }

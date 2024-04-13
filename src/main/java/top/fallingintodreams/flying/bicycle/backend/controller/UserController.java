@@ -39,7 +39,7 @@ public class UserController {
         } catch (IOException e) {
             return ApiResponse.error("上传失败");
         }
-        return ApiResponse.success("http://localhost:8002/image/"+newFileName, "上传成功");
+        return ApiResponse.success("http://localhost:8002/image/avatar/"+newFileName, "上传成功");
     }
 
     @GetMapping("getUserInfo")

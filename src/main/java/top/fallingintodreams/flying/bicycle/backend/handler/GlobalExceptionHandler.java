@@ -27,7 +27,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotLoginException.class)
     public ApiResponse notLoginException(NotLoginException e) {
         log.error("用户未登录", e);
-        return ApiResponse.error(e.getType(), e.getMessage());
+        return ApiResponse.error(Constant.ResponseCodeEnum.UNAUTHORIZED.getCode(), e.getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

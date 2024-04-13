@@ -2,6 +2,7 @@ package top.fallingintodreams.flying.bicycle.backend.controller;
 
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,6 +49,12 @@ public class GoodsController {
     public ApiResponse deleteGoods(@RequestParam Long goodsId) {
         goodsService.deleteGoods(goodsId);
         return ApiResponse.success("删除成功");
+    }
+
+    @GetMapping("/getGoodsById")
+    public ApiResponse getGoodsById(@RequestParam Long goodsId) {
+        Goods goods = goodsService.getGoodsById(goodsId);
+        return ApiResponse.success(goods);
     }
 
 }
