@@ -2,8 +2,10 @@ package top.fallingintodreams.flying.bicycle.backend.dao;
 
 import org.apache.ibatis.annotations.Mapper;
 import top.fallingintodreams.flying.bicycle.backend.po.Order;
+import top.fallingintodreams.flying.bicycle.backend.vo.ReservationGoodsVO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 订单Dao
@@ -39,5 +41,7 @@ public interface IOrderDao {
      * @return 订单信息
      */
     Order getOrderInfo(Order order);
+
+    List<ReservationGoodsVO> getReservationGoodsNum(Map<String, Object> searchMap);
 
 }

@@ -2,6 +2,7 @@ package top.fallingintodreams.flying.bicycle.backend.service;
 
 import top.fallingintodreams.flying.bicycle.backend.po.Goods;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,5 +39,7 @@ public interface GoodsService {
     void deleteGoods(Long goodsId);
 
     Goods getGoodsById(Long goodsId);
+
+    List<Goods> getValidGoodsList(Map<String, Object> searchMap);
 
 }

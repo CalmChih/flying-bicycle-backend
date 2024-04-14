@@ -7,16 +7,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import top.fallingintodreams.flying.bicycle.backend.common.Constant;
 import top.fallingintodreams.flying.bicycle.backend.dao.IGoodsDao;
+import top.fallingintodreams.flying.bicycle.backend.dao.IOrderDao;
 import top.fallingintodreams.flying.bicycle.backend.dto.GoodsDTO;
 import top.fallingintodreams.flying.bicycle.backend.po.Goods;
 import top.fallingintodreams.flying.bicycle.backend.service.CategorizationService;
 import top.fallingintodreams.flying.bicycle.backend.service.GoodsService;
 import top.fallingintodreams.flying.bicycle.backend.util.IdUtil;
+import top.fallingintodreams.flying.bicycle.backend.util.RedisUtil;
+import top.fallingintodreams.flying.bicycle.backend.vo.ReservationGoodsVO;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 商品表 服务实现类
@@ -29,9 +36,14 @@ public class GoodsServiceImpl implements GoodsService {
 
     @Resource
     private IGoodsDao goodsDao;
+    @Resource
+    private IOrderDao orderDao;
 
     @Resource
     private CategorizationService categorizationService;
+
+    @Resource
+    private RedisUtil redisUtil;
 
     @Override
     public void insertGoods(Goods goods) {
@@ -90,5 +102,58 @@ public class GoodsServiceImpl implements GoodsService {
     @Override
     public Goods getGoodsById(Long goodsId) {
         return goodsDao.getGoodsById(goodsId);
+    }
+
+    @Override
+    public List<Goods> getValidGoodsList(Map<String, Object> searchMap) {
+        String hMapKey = Constant.RedisKey.VALID_GOODS_LIST(searchMap.get("reservationStartTime").toString(),
+                searchMap.get("reservationEndTime").toString());
+        List<Goods> normalGoodsList = new ArrayList<>();
+        if (redisUtil.hasKey(hMapKey)) {
+            Map<Object, Object> validGoodsMap = redisUtil.hmget(hMapKey);
+            List<Object> goodsIds = validGoodsMap.keySet().stream().toList();
+            searchMap.put("goodsIds", goodsIds);
+            normalGoodsList = goodsDao.getNormalGoodsList(searchMap);
+        } else {
+            normalGoodsList = goodsDao.getNormalGoodsList(searchMap);
+            List<ReservationGoodsVO> reservationGoodsNum = orderDao.getReservationGoodsNum(searchMap);
+            Map<Long, Integer> goodsIdMap = reservationGoodsNum.stream().collect(
+                    Collectors.toMap(ReservationGoodsVO::getGoodsId, ReservationGoodsVO::getNum));
+            normalGoodsList = normalGoodsList.stream().filter(goods -> {
+                Long goodsId = goods.getGoodsId();
+                int num = goodsIdMap.getOrDefault(goodsId, 0);
+                int difference = goods.getGoodsNum() - num;
+                if (difference > 0) {
+                    goods.setGoodsNum(difference);
+                    return true;
+                }
+                return false;
+            }).toList();
+            Map<String, Object> validGoodsMap = new HashMap<>();
+            for (Goods goods : normalGoodsList) {
+                validGoodsMap.put(goods.getGoodsId().toString(), goods.getGoodsNum());
+            }
+            long seconds = getExpireTime(searchMap);
+            redisUtil.hmset(hMapKey, validGoodsMap, seconds);
+        }
+        if (searchMap.get("categoryId") != null) {
+            normalGoodsList = normalGoodsList.stream()
+                    .filter(goods -> goods.getCategoryId().equals(searchMap.get("categoryId")))
+                    .toList();
+        }
+        return normalGoodsList;
+    }
+
+    private long getExpireTime(Map<String, Object> searchMap) {
+        // 定义时间格式
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        // 解析时间字符串为LocalDateTime对象
+        LocalDateTime dateTime = LocalDateTime.parse(searchMap.get("reservationEndTime").toString(), formatter);
+        // 获取当前时间
+        LocalDateTime now = LocalDateTime.now();
+        // 计算时间差
+        Duration duration = Duration.between(now, dateTime);
+        // 将时间差转换为秒
+        return duration.toSeconds();
     }
 }

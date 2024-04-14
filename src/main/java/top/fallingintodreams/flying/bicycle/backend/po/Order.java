@@ -13,17 +13,21 @@ import java.util.Date;
 @Data
 public class Order {
     /**
-     * 订单id
+     * 主键id
      */
     private Long id;
     /**
-     * 账户id
+     * 订单id
      */
-    private Long accountId;
+    private Long orderId;
     /**
-     * 数量
+     * 账号
      */
-    private Integer num;
+    private Long username;
+    /**
+     * 商品id
+     */
+    private Long goodsId;
     /**
      * 租赁开始时间
      */

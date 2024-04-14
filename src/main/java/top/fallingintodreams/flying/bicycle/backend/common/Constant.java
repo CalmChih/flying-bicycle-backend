@@ -22,6 +22,11 @@ public class Constant {
 
         public static final String CATEGORY_MAP_KEY = "category";
 
+        public static final String VALID_GOODS_LIST_PREFIX = "valid:goods:";
+        public static String VALID_GOODS_LIST(String reservationStartTime, String reservationEndTime) {
+            return VALID_GOODS_LIST_PREFIX + reservationStartTime + "to" + reservationEndTime;
+        }
+
     }
 
     public static final class UserState {

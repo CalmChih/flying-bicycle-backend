@@ -73,4 +73,16 @@
         WHERE goods_id = #{goodsId}
     </select>
 
+    <select id="getNormalGoodsList" parameterType="hashmap" resultMap="goodsMap">
+        SELECT goods_id, goods_title, goods_desc, goods_num, goods_price, category_id, goods_tags, goods_img
+        FROM goods
+        WHERE state = 1
+        <if test="goodsIds != null">
+            AND goods_id IN
+            <foreach item="goodsId" collection="goodsIds" separator="," open="(" close=")" index="">
+                #{goodsId, jdbcType=BIGINT}
+            </foreach>
+        </if>
+    </select>
+
 </mapper>

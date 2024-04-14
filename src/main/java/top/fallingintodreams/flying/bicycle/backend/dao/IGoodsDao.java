@@ -45,4 +45,6 @@ public interface IGoodsDao {
      */
     Goods getGoodsById(Long goodsId);
 
+    List<Goods> getNormalGoodsList(Map<String, Object> searchMap);
+
 }

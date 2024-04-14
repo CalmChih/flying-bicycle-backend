@@ -12,6 +12,7 @@ import top.fallingintodreams.flying.bicycle.backend.common.ApiResponse;
 import top.fallingintodreams.flying.bicycle.backend.po.Goods;
 import top.fallingintodreams.flying.bicycle.backend.service.GoodsService;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,6 +56,12 @@ public class GoodsController {
     public ApiResponse getGoodsById(@RequestParam Long goodsId) {
         Goods goods = goodsService.getGoodsById(goodsId);
         return ApiResponse.success(goods);
+    }
+
+    @PostMapping("/getValidGoodsList")
+    public ApiResponse getValidGoodsList(@RequestBody Map<String, Object> searchMap) {
+        List<Goods> validGoodsList = goodsService.getValidGoodsList(searchMap);
+        return ApiResponse.success(validGoodsList);
     }
 
 }

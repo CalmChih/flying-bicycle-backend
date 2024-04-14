@@ -84,6 +84,13 @@ public class RedisUtil {
         }
     }
 
+    public void deleteKeysWithPrefix(String prefix) {
+        Set<String> keys = redisTemplate.keys(prefix + "*");
+        if (!CollectionUtils.isEmpty(keys)) {
+            redisTemplate.delete(keys);
+        }
+    }
+
     //============================String=============================
 
     /**
