@@ -2,6 +2,7 @@ package top.fallingintodreams.flying.bicycle.backend.po;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -19,11 +20,11 @@ public class Order {
     /**
      * 订单id
      */
-    private Long orderId;
+    private String orderId;
     /**
      * 账号
      */
-    private Long username;
+    private String username;
     /**
      * 商品id
      */
@@ -36,6 +37,14 @@ public class Order {
      * 租赁结束时间
      */
     private Date reservationEndTime;
+    /**
+     * 租赁天数
+     */
+    private Integer reservationDays;
+    /**
+     * 总价
+     */
+    private BigDecimal totalPrice;
     /**
      * 支付时间
      */

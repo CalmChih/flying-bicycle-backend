@@ -3,6 +3,7 @@ package top.fallingintodreams.flying.bicycle.backend.controller;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 import top.fallingintodreams.flying.bicycle.backend.common.ApiResponse;
+import top.fallingintodreams.flying.bicycle.backend.dto.OrderDTO;
 import top.fallingintodreams.flying.bicycle.backend.po.Order;
 import top.fallingintodreams.flying.bicycle.backend.service.OrderService;
 
@@ -22,9 +23,8 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping("/addOrder")
-    public ApiResponse insertOrder(@RequestBody Order order) {
-        orderService.insertOrder(order);
-        return ApiResponse.success("下单成功，请及时付款");
+    public ApiResponse insertOrder(@RequestBody OrderDTO orderDTO) {
+        return orderService.insertOrder(orderDTO);
     }
 
     @PostMapping("/updateOrder")

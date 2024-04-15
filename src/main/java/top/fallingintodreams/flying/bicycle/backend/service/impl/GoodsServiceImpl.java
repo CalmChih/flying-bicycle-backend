@@ -134,7 +134,9 @@ public class GoodsServiceImpl implements GoodsService {
                 validGoodsMap.put(goods.getGoodsId().toString(), goods.getGoodsNum());
             }
             long seconds = getExpireTime(searchMap);
-            redisUtil.hmset(hMapKey, validGoodsMap, seconds);
+            if (!redisUtil.hasKey(hMapKey)) {
+                redisUtil.hmset(hMapKey, validGoodsMap, seconds);
+            }
         }
         if (searchMap.get("categoryId") != null) {
             normalGoodsList = normalGoodsList.stream()

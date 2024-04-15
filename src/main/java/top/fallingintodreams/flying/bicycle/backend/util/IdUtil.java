@@ -1,6 +1,7 @@
 package top.fallingintodreams.flying.bicycle.backend.util;
 
 import cn.hutool.core.util.RandomUtil;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.Calendar;
 import java.util.Random;
@@ -32,5 +33,9 @@ public class IdUtil {
 
     public static Long generateTagId() {
         return RandomUtil.randomLong(10000000, 100000000, true, false);
+    }
+
+    public static String generateOrderId() {
+        return RandomStringUtils.randomNumeric(19);
     }
 }

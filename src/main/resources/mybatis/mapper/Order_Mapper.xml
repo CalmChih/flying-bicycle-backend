@@ -9,6 +9,8 @@
         <result column="goods_id" property="goodsId"/>
         <result column="reservation_start_time" property="reservationStartTime"/>
         <result column="reservation_end_time" property="reservationEndTime"/>
+        <result column="reservation_days" property="reservationDays"/>
+        <result column="total_price" property="totalPrice"/>
         <result column="pay_time" property="payTime"/>
         <result column="order_state" property="orderState"/>
         <result column="create_time" property="createTime"/>
@@ -16,9 +18,11 @@
     </resultMap>
 
     <insert id="insertOrder" parameterType="top.fallingintodreams.flying.bicycle.backend.po.Order">
-        INSERT INTO `order` (order_id, username, goods_id, reservation_start_time, reservation_end_time, create_time,
+        INSERT INTO `order` (order_id, username, goods_id, reservation_start_time, reservation_end_time,
+                             reservation_days, total_price, create_time,
                              update_time)
-        VALUES (#{orderId}, #{username}, #{goodsId}, #{reservationStartTime}, #{reservationEndTime}, NOW(), NOW())
+        VALUES (#{orderId}, #{username}, #{goodsId}, #{reservationStartTime}, #{reservationEndTime}, #{reservationDays},
+                #{totalPrice}, NOW(), NOW())
     </insert>
 
     <update id="updateOrder" parameterType="top.fallingintodreams.flying.bicycle.backend.po.Order">

@@ -18,7 +18,7 @@ public class RandomStringUtilsTest {
 
     @Test
     void testRandomCaptcha() {
-        System.out.println(RandomStringUtils.randomNumeric(6));
+        System.out.println(RandomStringUtils.randomNumeric(19));
         System.out.println(RandomStringUtils.randomGraph(8));
         System.out.println(RandomStringUtils.randomAscii(8));
         System.out.println(RandomStringUtils.randomAlphabetic(8));
