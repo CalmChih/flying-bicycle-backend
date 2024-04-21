@@ -7,7 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import top.fallingintodreams.flying.bicycle.backend.common.ApiResponse;
 import top.fallingintodreams.flying.bicycle.backend.common.Constant;
 import top.fallingintodreams.flying.bicycle.backend.common.EmailService;
@@ -53,20 +57,6 @@ public class LoginController {
         return ApiResponse.success(tokenInfo, "登录成功");
     }
 
-    @PostMapping("adminLogin")
-    public ApiResponse adminLogin(@RequestBody UserAccountDTO userAccountDTO) {
-        if (StringUtils.isBlank(userAccountDTO.getUsername()) || !RegexUtil.matchEmail(userAccountDTO.getUsername())) {
-            throw new LoginException(LoginEnum.MAIL_FORMAT_ERROR);
-        }
-        if (!"admin@123.com".equals(userAccountDTO.getUsername())) {
-            throw new LoginException(LoginEnum.NOT_ADMIN_ACCOUNT);
-        }
-        userAccountService.loginWithPassword(userAccountDTO);
-        StpUtil.login(userAccountDTO.getUsername());
-        SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
-        return ApiResponse.success(tokenInfo, "登录成功");
-    }
-
     @GetMapping("/sendCaptcha")
     public ApiResponse senCaptcha(@RequestParam String emailAccount) {
         if (StringUtils.isBlank(emailAccount) || !RegexUtil.matchEmail(emailAccount)) {
@@ -79,6 +69,20 @@ public class LoginController {
         }
         emailService.sendEmail(emailAccount, "飞驰自行车", String.format("您的验证码为：%s，3分钟内有效。", captcha));
         return ApiResponse.success("验证码发送成功：" + captcha);
+    }
+
+    @PostMapping("adminLogin")
+    public ApiResponse adminLogin(@RequestBody UserAccountDTO userAccountDTO) {
+        if (StringUtils.isBlank(userAccountDTO.getUsername()) || !RegexUtil.matchEmail(userAccountDTO.getUsername())) {
+            throw new LoginException(LoginEnum.MAIL_FORMAT_ERROR);
+        }
+        if (!"admin@123.com".equals(userAccountDTO.getUsername())) {
+            throw new LoginException(LoginEnum.NOT_ADMIN_ACCOUNT);
+        }
+        userAccountService.loginWithPassword(userAccountDTO);
+        StpUtil.login(userAccountDTO.getUsername());
+        SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
+        return ApiResponse.success(tokenInfo, "登录成功");
     }
 
     @PostMapping("/logout")

@@ -37,10 +37,10 @@ public interface IOrderDao {
 
     /**
      * 获取订单信息
-     * @param order 订单id 和 账户id
+     * @param orderId 订单id
      * @return 订单信息
      */
-    Order getOrderInfo(Order order);
+    Order getOrderInfo(String orderId);
 
     List<ReservationGoodsVO> getReservationGoodsNum(Map<String, Object> searchMap);
 

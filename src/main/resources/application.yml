@@ -104,3 +104,14 @@ mybatis:
 pagehelper:
   helperDialect: mysql
   reasonable: true
+
+alipay:
+  appId: ${flying.alipay.appId}
+  # 支付宝网关
+  serverUrl: ${flying.alipay.serverUrl}
+  notifyUrl: ${flying.alipay.notifyUrl}
+  privateKey: ${flying.alipay.privateKey}
+  alipay-public-key: ${flying.alipay.alipay-public-key}
+  format: json
+  charset: UTF-8
+  signType: RSA2

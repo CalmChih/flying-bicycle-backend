@@ -28,15 +28,14 @@
     <update id="updateOrder" parameterType="top.fallingintodreams.flying.bicycle.backend.po.Order">
         UPDATE `order`
         <set>
-            update_time = NOW()
             <if test="payTime != null">
-                pay_time = #{payTime}
+                pay_time = #{payTime},
             </if>
             <if test="orderState != null">
                 order_state = #{orderState}
             </if>
         </set>
-        WHERE id = #{id}
+        WHERE order_id = #{orderId}
     </update>
 
     <select id="getOrderList" parameterType="long" resultMap="orderMap">
@@ -50,16 +49,20 @@
         WHERE username = #{username}
     </select>
 
-    <select id="getOrderInfo" parameterType="top.fallingintodreams.flying.bicycle.backend.po.Order"
+    <select id="getOrderInfo" parameterType="string"
             resultMap="orderMap">
-        SELECT reservation_start_time,
+        SELECT username,
+               order_id,
+               goods_id,
+               reservation_start_time,
                reservation_end_time,
+               reservation_days,
+               total_price,
                pay_time,
                order_state,
                create_time
         FROM `order`
         WHERE order_id = #{orderId}
-          AND username = #{username}
     </select>
 
     <select id="getReservationGoodsNum" parameterType="hashmap"

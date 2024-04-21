@@ -1,7 +1,9 @@
 package top.fallingintodreams.flying.bicycle.backend.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import top.fallingintodreams.flying.bicycle.backend.common.ApiResponse;
 import top.fallingintodreams.flying.bicycle.backend.dto.OrderDTO;
+import top.fallingintodreams.flying.bicycle.backend.dto.OrderInfoDTO;
 import top.fallingintodreams.flying.bicycle.backend.po.Order;
 
 import java.util.List;
@@ -34,8 +36,12 @@ public interface OrderService {
 
     /**
      * 获取订单信息
-     * @param order 订单id 和 账户id
+     * @param orderId 订单id
      * @return 订单信息
      */
-    Order getOrderInfo(Order order);
+    OrderInfoDTO getOrderInfo(String orderId);
+
+    String payOrder(String orderId);
+
+    void payCallback(HttpServletRequest request);
 }

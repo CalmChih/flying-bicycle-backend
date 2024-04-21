@@ -29,6 +29,33 @@ public class Constant {
 
     }
 
+    public static final class OrderState {
+        /**
+         * 未支付
+         */
+        public static final int UNPAID = 0;
+        /**
+         * 支付成功
+         */
+        public static final int PAID = 1;
+        /**
+         * 已取车
+         */
+        public static final int PICKED_UP = 2;
+        /**
+         * 已还车
+         */
+        public static final int VEHICLES_RETURNED = 3;
+        /**
+         * 已退款
+         */
+        public static final int REFUNDED = 4;
+        /**
+         * 已取消
+         */
+        public static final int CANCELLED = 5;
+    }
+
     public static final class UserState {
 
         /**

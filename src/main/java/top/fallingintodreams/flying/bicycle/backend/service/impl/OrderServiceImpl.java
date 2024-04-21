@@ -1,15 +1,30 @@
 package top.fallingintodreams.flying.bicycle.backend.service.impl;
 
+import com.alibaba.fastjson2.JSON;
+import com.alipay.api.AlipayApiException;
+import com.alipay.api.AlipayClient;
+import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.domain.AlipayTradeWapPayModel;
+import com.alipay.api.internal.util.AlipaySignature;
+import com.alipay.api.request.AlipayTradeWapPayRequest;
+import com.alipay.api.response.AlipayTradeWapPayResponse;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Repository;
 import top.fallingintodreams.flying.bicycle.backend.common.ApiResponse;
 import top.fallingintodreams.flying.bicycle.backend.common.Constant;
+import top.fallingintodreams.flying.bicycle.backend.config.AlipayConfig;
+import top.fallingintodreams.flying.bicycle.backend.dao.IGoodsDao;
 import top.fallingintodreams.flying.bicycle.backend.dao.IOrderDao;
 import top.fallingintodreams.flying.bicycle.backend.dto.OrderDTO;
+import top.fallingintodreams.flying.bicycle.backend.dto.OrderInfoDTO;
 import top.fallingintodreams.flying.bicycle.backend.po.Goods;
 import top.fallingintodreams.flying.bicycle.backend.po.Order;
 import top.fallingintodreams.flying.bicycle.backend.service.GoodsService;
@@ -29,11 +44,14 @@ import java.util.Map;
  * @author Chih
  * @date 2024/2/29 23:03
  */
+@Slf4j
 @Repository
 public class OrderServiceImpl implements OrderService {
 
     @Resource
     private IOrderDao orderDao;
+    @Resource
+    private IGoodsDao goodsDao;
 
     @Resource
     private GoodsService goodsService;
@@ -42,6 +60,9 @@ public class OrderServiceImpl implements OrderService {
     private RedisUtil redisUtil;
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
+
+    @Resource
+    private AlipayConfig alipayConfig;
 
     private static final DefaultRedisScript<Long> STOCKS_DECREMENT;
 
@@ -89,7 +110,7 @@ public class OrderServiceImpl implements OrderService {
         order.setReservationDays(orderDTO.getReservationDays());
         order.setTotalPrice(orderDTO.getTotalPrice());
         orderDao.insertOrder(order);
-        return ApiResponse.success();
+        return ApiResponse.success(order.getOrderId(), "下单成功");
     }
 
     @Override
@@ -103,8 +124,80 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order getOrderInfo(Order order) {
-        return orderDao.getOrderInfo(order);
+    public OrderInfoDTO getOrderInfo(String orderId) {
+        Order order = orderDao.getOrderInfo(orderId);
+        Goods goods = goodsDao.getGoodsById(order.getGoodsId());
+        OrderInfoDTO orderInfoDTO = new OrderInfoDTO();
+        orderInfoDTO.setUsername(order.getUsername());
+        orderInfoDTO.setOrderId(order.getOrderId());
+        orderInfoDTO.setReservationStartTime(DateFormatUtils.format(order.getReservationStartTime(), "yyyy-MM-dd HH:mm"));
+        orderInfoDTO.setReservationEndTime(DateFormatUtils.format(order.getReservationEndTime(), "yyyy-MM-dd HH:mm"));
+        orderInfoDTO.setCreateTime(DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
+        orderInfoDTO.setReservationDays(order.getReservationDays());
+        orderInfoDTO.setTotalPrice(order.getTotalPrice());
+        orderInfoDTO.setGoodsTitle(goods.getGoodsTitle());
+        orderInfoDTO.setGoodsDesc(goods.getGoodsDesc());
+        orderInfoDTO.setGoodsImg(goods.getGoodsImg());
+        return orderInfoDTO;
     }
 
+    @Override
+    public String payOrder(String orderId) {
+        Order orderInfo = orderDao.getOrderInfo(orderId);
+        Goods goods = goodsDao.getGoodsById(orderInfo.getGoodsId());
+        AlipayClient alipayClient = new DefaultAlipayClient(alipayConfig.getServerUrl(),
+                alipayConfig.getAppId(), alipayConfig.getPrivateKey(), alipayConfig.getFormat(),
+                alipayConfig.getCharset(), alipayConfig.getAlipayPublicKey(), alipayConfig.getSignType());
+        log.info("配置：{}", JSON.toJSONString(alipayConfig));
+
+        AlipayTradeWapPayRequest request = getAlipayTradeWapPayRequest(orderInfo, goods);
+        AlipayTradeWapPayResponse response;
+        try {
+            response = alipayClient.pageExecute(request, "POST");
+        } catch (AlipayApiException e) {
+            throw new RuntimeException(e);
+        }
+        log.info(response.getBody());
+        return response.getBody();
+    }
+
+    @NotNull
+    private AlipayTradeWapPayRequest getAlipayTradeWapPayRequest(Order orderInfo, Goods goods) {
+        AlipayTradeWapPayRequest request = new AlipayTradeWapPayRequest();
+        request.setNotifyUrl(alipayConfig.getNotifyUrl());
+        request.setReturnUrl("http://localhost:5173/user");
+        AlipayTradeWapPayModel model = new AlipayTradeWapPayModel();
+        model.setOutTradeNo(orderInfo.getOrderId());
+        model.setTotalAmount(orderInfo.getTotalPrice().toString());
+        model.setSubject(goods.getGoodsTitle());
+        model.setProductCode("QUICK_WAP_WAY");
+        model.setSellerId("2088721033871118");
+        request.setBizModel(model);
+        return request;
+    }
+
+    @Override
+    public void payCallback(HttpServletRequest request) {
+        Map<String, String[]> parameterMap = request.getParameterMap();
+        Map<String, String> params = new HashMap<>();
+        for (String key : parameterMap.keySet()) {
+            params.put(key, request.getParameter(key));
+        }
+        String sign = params.get("sign");
+        String signatureContent = AlipaySignature.getSignCheckContentV1(params);
+        params.forEach((key, value) -> {
+            log.info(key + ":" + value);
+        });
+        boolean checkContent = false;
+        try {
+            checkContent = AlipaySignature.rsa256CheckContent(signatureContent, sign, alipayConfig.getAlipayPublicKey(), alipayConfig.getCharset());
+        } catch (AlipayApiException e) {
+            throw new RuntimeException(e);
+        }
+        if (checkContent) {
+            params.forEach((key, value) -> {
+                log.info(key + ":" + value);
+            });
+        }
+    }
 }
