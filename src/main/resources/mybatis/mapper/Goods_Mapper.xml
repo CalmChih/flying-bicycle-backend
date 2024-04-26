@@ -85,4 +85,10 @@
         </if>
     </select>
 
+    <select id="getGoodsByTag" parameterType="string" resultMap="goodsMap">
+        SELECT goods_id, goods_title, goods_desc, goods_price, goods_img
+        FROM goods
+        WHERE goods_tags LIKE CONCAT('%', #{tag}, '%')
+    </select>
+
 </mapper>

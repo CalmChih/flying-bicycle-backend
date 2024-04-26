@@ -2,6 +2,8 @@ package top.fallingintodreams.flying.bicycle.backend.dao;
 
 import org.apache.ibatis.annotations.Mapper;
 import top.fallingintodreams.flying.bicycle.backend.po.Order;
+import top.fallingintodreams.flying.bicycle.backend.vo.OrderGoodsVO;
+import top.fallingintodreams.flying.bicycle.backend.vo.OrderStateCountVO;
 import top.fallingintodreams.flying.bicycle.backend.vo.ReservationGoodsVO;
 
 import java.util.List;
@@ -29,19 +31,20 @@ public interface IOrderDao {
     void updateOrder(Order order);
 
     /**
-     * 获取订单列表 分页
-     * @param accountId 账户id
+     * 获取订单列表 分页、
      * @return 订单列表
      */
-    List<Order> getOrderList(Long accountId);
+    List<OrderGoodsVO> getOrderList(Map<String, Object> searchMap);
 
     /**
      * 获取订单信息
      * @param orderId 订单id
      * @return 订单信息
      */
-    Order getOrderInfo(String orderId);
+    OrderGoodsVO getOrderInfo(String orderId);
 
     List<ReservationGoodsVO> getReservationGoodsNum(Map<String, Object> searchMap);
+
+    List<OrderStateCountVO> getOrderCountGroupByState(String username);
 
 }

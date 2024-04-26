@@ -1,5 +1,6 @@
 package top.fallingintodreams.flying.bicycle.backend.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,11 +11,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import top.fallingintodreams.flying.bicycle.backend.common.ApiResponse;
 import top.fallingintodreams.flying.bicycle.backend.dto.OrderDTO;
-import top.fallingintodreams.flying.bicycle.backend.dto.OrderInfoDTO;
+import top.fallingintodreams.flying.bicycle.backend.dto.OrderGoodsDTO;
 import top.fallingintodreams.flying.bicycle.backend.po.Order;
 import top.fallingintodreams.flying.bicycle.backend.service.OrderService;
+import top.fallingintodreams.flying.bicycle.backend.vo.OrderStateCountVO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 订单Controller
@@ -40,28 +43,40 @@ public class OrderController {
         return ApiResponse.success();
     }
 
-    @GetMapping("/getOrderList")
-    public ApiResponse getOrderList(@RequestParam Long accountId) {
-        List<Order> orderList = orderService.getOrderList(accountId);
+    @PostMapping("/cancelOrder")
+    public ApiResponse cancelOrder(@RequestBody Map<String, Object> searchMap) {
+        return orderService.cancelOrder(searchMap);
+    }
+
+    @PostMapping("/pickupBicycle")
+    public ApiResponse pickupBicycle(@RequestBody Map<String, Object> searchMap) {
+        return orderService.pickupBicycle(searchMap);
+    }
+
+    @PostMapping("/getOrderList")
+    public ApiResponse getOrderList(@RequestBody Map<String, Object> searchMap) {
+        String username = StpUtil.getLoginIdAsString();
+        searchMap.put("username", username);
+        List<OrderGoodsDTO> orderList = orderService.getOrderList(searchMap);
         return ApiResponse.success(orderList);
     }
 
     @GetMapping("/getOrderInfo")
     public ApiResponse getOrderInfo(@RequestParam String orderId) {
-        OrderInfoDTO orderInfo = orderService.getOrderInfo(orderId);
-        return ApiResponse.success(orderInfo);
+        OrderGoodsDTO orderGoodsDTO = orderService.getOrderInfo(orderId);
+        return ApiResponse.success(orderGoodsDTO);
+    }
+
+    @GetMapping("/getOrderCountGroupByState")
+    public ApiResponse getOrderCountGroupByState() {
+        String username = StpUtil.getLoginIdAsString();
+        List<OrderStateCountVO> orderCountGroupByState = orderService.getOrderCountGroupByState(username);
+        return ApiResponse.success(orderCountGroupByState);
     }
 
     @GetMapping("/pay")
     public ApiResponse payOrder(@RequestParam String orderId) {
         String form = orderService.payOrder(orderId);
-//        httpServletResponse.setContentType("text/html;charset=UTF-8");
-//        try (PrintWriter writer = httpServletResponse.getWriter();){
-//            writer.write(form);
-//            writer.flush();
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
         return ApiResponse.success(form, "成功");
     }
 

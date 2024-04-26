@@ -64,4 +64,10 @@ public class GoodsController {
         return ApiResponse.success(validGoodsList);
     }
 
+    @GetMapping("/getGoodsByTag")
+    public ApiResponse getGoodsByTag(@RequestParam String tag) {
+        List<Goods> goodsList = goodsService.getGoodsByTag(tag);
+        return ApiResponse.success(goodsList);
+    }
+
 }

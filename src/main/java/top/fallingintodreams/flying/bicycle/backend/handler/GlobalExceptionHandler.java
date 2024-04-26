@@ -1,9 +1,11 @@
 package top.fallingintodreams.flying.bicycle.backend.handler;
 
 import cn.dev33.satoken.exception.NotLoginException;
+import cn.hutool.core.io.resource.NoResourceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import top.fallingintodreams.flying.bicycle.backend.common.ApiResponse;
 import top.fallingintodreams.flying.bicycle.backend.common.Constant;
 import top.fallingintodreams.flying.bicycle.backend.handler.exception.LoginException;
@@ -35,6 +37,13 @@ public class GlobalExceptionHandler {
         log.error("非法参数", e);
         return ApiResponse.error(Constant.ResponseCodeEnum.ILLEGAL_PARAMETERS.getCode(),
                 Constant.ResponseCodeEnum.ILLEGAL_PARAMETERS.getMsg());
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ApiResponse noResourceFoundException(NoResourceException noResourceException) {
+        log.error("没有该资源", noResourceException);
+        return ApiResponse.error(Constant.ResponseCodeEnum.PATH_ERROR.getCode(),
+                Constant.ResponseCodeEnum.PATH_ERROR.getMsg());
     }
 
     @ExceptionHandler(Exception.class)

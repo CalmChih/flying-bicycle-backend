@@ -42,4 +42,6 @@ public interface GoodsService {
 
     List<Goods> getValidGoodsList(Map<String, Object> searchMap);
 
+    List<Goods> getGoodsByTag(String tag);
+
 }

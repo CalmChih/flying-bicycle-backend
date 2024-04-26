@@ -3,10 +3,12 @@ package top.fallingintodreams.flying.bicycle.backend.service;
 import jakarta.servlet.http.HttpServletRequest;
 import top.fallingintodreams.flying.bicycle.backend.common.ApiResponse;
 import top.fallingintodreams.flying.bicycle.backend.dto.OrderDTO;
-import top.fallingintodreams.flying.bicycle.backend.dto.OrderInfoDTO;
+import top.fallingintodreams.flying.bicycle.backend.dto.OrderGoodsDTO;
 import top.fallingintodreams.flying.bicycle.backend.po.Order;
+import top.fallingintodreams.flying.bicycle.backend.vo.OrderStateCountVO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 订单 服务接口类
@@ -27,19 +29,25 @@ public interface OrderService {
      */
     void updateOrder(Order order);
 
+    ApiResponse cancelOrder(Map<String, Object> searchMap);
+
+    ApiResponse pickupBicycle(Map<String, Object> searchMap);
+
     /**
      * 获取订单列表 分页
-     * @param accountId 账户id
      * @return 订单列表
      */
-    List<Order> getOrderList(Long accountId);
+    List<OrderGoodsDTO> getOrderList(Map<String, Object> searchMap);
 
     /**
      * 获取订单信息
+     *
      * @param orderId 订单id
      * @return 订单信息
      */
-    OrderInfoDTO getOrderInfo(String orderId);
+    OrderGoodsDTO getOrderInfo(String orderId);
+
+    List<OrderStateCountVO> getOrderCountGroupByState(String username);
 
     String payOrder(String orderId);
 

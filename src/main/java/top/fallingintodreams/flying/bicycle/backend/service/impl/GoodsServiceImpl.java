@@ -158,4 +158,9 @@ public class GoodsServiceImpl implements GoodsService {
         // 将时间差转换为秒
         return duration.toSeconds();
     }
+
+    @Override
+    public List<Goods> getGoodsByTag(String tag) {
+        return goodsDao.getGoodsByTag(tag);
+    }
 }

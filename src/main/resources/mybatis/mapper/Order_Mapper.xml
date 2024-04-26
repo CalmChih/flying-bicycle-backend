@@ -38,30 +38,42 @@
         WHERE order_id = #{orderId}
     </update>
 
-    <select id="getOrderList" parameterType="long" resultMap="orderMap">
-        SELECT id,
-               reservation_start_time,
-               reservation_end_time,
-               pay_time,
-               order_state,
-               create_time
-        FROM `order`
+    <select id="getOrderList" resultType="top.fallingintodreams.flying.bicycle.backend.vo.OrderGoodsVO">
+        SELECT o.order_id orderId,
+        o.reservation_start_time reservationStartTime,
+        o.reservation_end_time reservationEndTime,
+        o.reservation_days reservationDays,
+        o.total_price totalPrice,
+        o.pay_time payTime,
+        o.order_state orderState,
+        o.create_time createTime,
+        g.goods_title goodsTitle,
+        g.goods_img goodsImg,
+        g.goods_desc goodsDesc
+        FROM `order` o LEFT JOIN goods g on g.goods_id = o.goods_id
         WHERE username = #{username}
+        <if test="orderStates != null and orderStates != ''">
+            AND order_state IN (#{orderStates})
+        </if>
+        ORDER BY o.create_time DESC
     </select>
 
     <select id="getOrderInfo" parameterType="string"
-            resultMap="orderMap">
-        SELECT username,
-               order_id,
-               goods_id,
-               reservation_start_time,
-               reservation_end_time,
-               reservation_days,
-               total_price,
-               pay_time,
-               order_state,
-               create_time
-        FROM `order`
+            resultType="top.fallingintodreams.flying.bicycle.backend.vo.OrderGoodsVO">
+        SELECT o.order_id               orderId,
+               o.reservation_start_time reservationStartTime,
+               o.reservation_end_time   reservationEndTime,
+               o.reservation_days       reservationDays,
+               o.total_price            totalPrice,
+               o.pay_time               payTime,
+               o.order_state            orderState,
+               o.create_time            createTime,
+               g.goods_title            goodsTitle,
+               g.goods_desc             goodsDesc,
+               g.goods_price            goodsPrice,
+               g.goods_img              goodsImg
+        FROM `order` o
+                 LEFT JOIN goods g on g.goods_id = o.goods_id
         WHERE order_id = #{orderId}
     </select>
 
@@ -72,5 +84,13 @@
         WHERE reservation_start_time &lt;= #{reservationEndTime}
           AND reservation_end_time &gt;= #{reservationStartTime}
         GROUP BY goods_id
+    </select>
+
+    <select id="getOrderCountGroupByState" parameterType="string"
+            resultType="top.fallingintodreams.flying.bicycle.backend.vo.OrderStateCountVO">
+        SELECT order_state orderState, COUNT(*) count
+        FROM `order`
+        WHERE username = #{username}
+        GROUP BY order_state
     </select>
 </mapper>

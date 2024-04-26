@@ -47,4 +47,6 @@ public interface IGoodsDao {
 
     List<Goods> getNormalGoodsList(Map<String, Object> searchMap);
 
+    List<Goods> getGoodsByTag(String tag);
+
 }

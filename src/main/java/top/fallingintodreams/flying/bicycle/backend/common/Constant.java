@@ -29,31 +29,59 @@ public class Constant {
 
     }
 
-    public static final class OrderState {
+    @Getter
+    public enum OrderStateEnum {
         /**
          * 未支付
          */
-        public static final int UNPAID = 0;
+        UNPAID(0, "待支付"),
         /**
          * 支付成功
          */
-        public static final int PAID = 1;
+        PAID(1, "待取车"),
         /**
          * 已取车
          */
-        public static final int PICKED_UP = 2;
+        PICKED_UP(2, "待还车"),
         /**
          * 已还车
          */
-        public static final int VEHICLES_RETURNED = 3;
+        VEHICLES_RETURNED(3, "交易成功"),
         /**
          * 已退款
          */
-        public static final int REFUNDED = 4;
+        REFUNDED(4, "交易退款"),
         /**
          * 已取消
          */
-        public static final int CANCELLED = 5;
+        CANCELLED(5, "交易取消"),
+        /**
+         * 申请售后
+         */
+        APPLY_FOR_AFTER_SALES(6, "售后中");
+
+        private final Integer stateCode;
+        private final String stateValue;
+
+        OrderStateEnum(Integer stateCode, String stateValue) {
+            this.stateCode = stateCode;
+            this.stateValue = stateValue;
+        }
+
+        private static final Map<Integer, String> outOrderStateMap = new HashMap<>();
+        static {
+            outOrderStateMap.put(UNPAID.getStateCode(), UNPAID.getStateValue());
+            outOrderStateMap.put(PAID.getStateCode(), PAID.getStateValue());
+            outOrderStateMap.put(PICKED_UP.getStateCode(), PICKED_UP.getStateValue());
+            outOrderStateMap.put(VEHICLES_RETURNED.getStateCode(), VEHICLES_RETURNED.getStateValue());
+            outOrderStateMap.put(REFUNDED.getStateCode(), REFUNDED.getStateValue());
+            outOrderStateMap.put(CANCELLED.getStateCode(), CANCELLED.getStateValue());
+            outOrderStateMap.put(APPLY_FOR_AFTER_SALES.getStateCode(), APPLY_FOR_AFTER_SALES.getStateValue());
+        }
+        public static String convert(Integer orderState) {
+            return outOrderStateMap.get(orderState);
+        }
+
     }
 
     public static final class UserState {
@@ -118,7 +146,11 @@ public class Constant {
         /**
          * 非法参数
          */
-        ILLEGAL_PARAMETERS("1001", "非法参数");
+        ILLEGAL_PARAMETERS("1001", "非法参数"),
+        /**
+         * 请求路径错误
+         */
+        PATH_ERROR("1002", "请求路径错误");
 
         private final String code;
         private final String msg;
