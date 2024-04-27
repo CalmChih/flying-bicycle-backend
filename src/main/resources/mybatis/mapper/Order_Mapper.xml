@@ -12,6 +12,8 @@
         <result column="reservation_days" property="reservationDays"/>
         <result column="total_price" property="totalPrice"/>
         <result column="pay_time" property="payTime"/>
+        <result column="refund_amount" property="refundAmount"/>
+        <result column="refund_reason" property="refundReason"/>
         <result column="order_state" property="orderState"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
@@ -29,10 +31,16 @@
         UPDATE `order`
         <set>
             <if test="payTime != null">
-                pay_time = #{payTime},
+                pay_time = #{payTime}
             </if>
             <if test="orderState != null">
                 order_state = #{orderState}
+            </if>
+            <if test="refundAmount != null">
+                , refund_amount = #{refundAmount}
+            </if>
+            <if test="refundReason != null and refundReason != ''">
+                , refund_reason = #{refundReason}
             </if>
         </set>
         WHERE order_id = #{orderId}
@@ -46,6 +54,8 @@
         o.total_price totalPrice,
         o.pay_time payTime,
         o.order_state orderState,
+        o.refund_amount refundAmount,
+        o.refund_reason refundReason,
         o.create_time createTime,
         g.goods_title goodsTitle,
         g.goods_img goodsImg,
@@ -53,7 +63,7 @@
         FROM `order` o LEFT JOIN goods g on g.goods_id = o.goods_id
         WHERE username = #{username}
         <if test="orderStates != null and orderStates != ''">
-            AND order_state IN (#{orderStates})
+            AND order_state IN (${orderStates})
         </if>
         ORDER BY o.create_time DESC
     </select>

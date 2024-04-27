@@ -1,7 +1,6 @@
 package top.fallingintodreams.flying.bicycle.backend.handler;
 
 import cn.dev33.satoken.exception.NotLoginException;
-import cn.hutool.core.io.resource.NoResourceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -40,8 +39,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
-    public ApiResponse noResourceFoundException(NoResourceException noResourceException) {
-        log.error("没有该资源", noResourceException);
+    public ApiResponse noResourceFoundException(NoResourceFoundException e) {
+        log.error("没有该资源", e);
         return ApiResponse.error(Constant.ResponseCodeEnum.PATH_ERROR.getCode(),
                 Constant.ResponseCodeEnum.PATH_ERROR.getMsg());
     }

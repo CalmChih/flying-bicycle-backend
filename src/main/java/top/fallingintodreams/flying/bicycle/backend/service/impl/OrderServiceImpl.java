@@ -165,6 +165,26 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public ApiResponse returnBicycle(Map<String, Object> searchMap) {
+        Order order = new Order();
+        order.setOrderId(searchMap.get("orderId").toString());
+        order.setOrderState(Constant.OrderStateEnum.VEHICLES_RETURNED.getStateCode());
+        orderDao.updateOrder(order);
+        return ApiResponse.success();
+    }
+
+    @Override
+    public ApiResponse applyForAfterSales(OrderGoodsDTO orderGoodsDTO) {
+        Order order = new Order();
+        order.setOrderId(orderGoodsDTO.getOrderId());
+        order.setRefundAmount(orderGoodsDTO.getRefundAmount());
+        order.setRefundReason(orderGoodsDTO.getRefundReason());
+        order.setOrderState(Constant.OrderStateEnum.APPLY_FOR_AFTER_SALES.getStateCode());
+        orderDao.updateOrder(order);
+        return ApiResponse.success();
+    }
+
+    @Override
     public List<OrderGoodsDTO> getOrderList(Map<String, Object> searchMap) {
         List<OrderGoodsVO> orderList = orderDao.getOrderList(searchMap);
         List<OrderGoodsDTO> orderGoodsDTOList = new ArrayList<>();
@@ -189,6 +209,8 @@ public class OrderServiceImpl implements OrderService {
         orderGoodsDTO.setTotalPrice(orderGoodsVO.getTotalPrice());
         orderGoodsDTO.setPayTime(dateFormatToString(orderGoodsVO.getPayTime()));
         orderGoodsDTO.setOrderState(Constant.OrderStateEnum.convert(orderGoodsVO.getOrderState()));
+        orderGoodsDTO.setRefundAmount(orderGoodsVO.getRefundAmount());
+        orderGoodsDTO.setRefundReason(orderGoodsVO.getRefundReason());
         orderGoodsDTO.setCreateTime(dateFormatToString(orderGoodsVO.getCreateTime()));
         orderGoodsDTO.setGoodsTitle(orderGoodsVO.getGoodsTitle());
         orderGoodsDTO.setGoodsImg(orderGoodsVO.getGoodsImg());

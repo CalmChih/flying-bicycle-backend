@@ -14,6 +14,8 @@ public class OrderGoodsDTO {
     private BigDecimal totalPrice;
     private String payTime;
     private String orderState;
+    private BigDecimal refundAmount;
+    private String refundReason;
     private String createTime;
     private String goodsTitle;
     private String goodsImg;

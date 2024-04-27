@@ -50,6 +50,14 @@ public class Order {
      */
     private Date payTime;
     /**
+     * 退款金额
+     */
+    private BigDecimal refundAmount;
+    /**
+     * 退款理由
+     */
+    private String refundReason;
+    /**
      * 订单状态
      */
     private Integer orderState;

@@ -33,6 +33,10 @@ public interface OrderService {
 
     ApiResponse pickupBicycle(Map<String, Object> searchMap);
 
+    ApiResponse returnBicycle(Map<String, Object> searchMap);
+
+    ApiResponse applyForAfterSales(OrderGoodsDTO orderGoodsDTO);
+
     /**
      * 获取订单列表 分页
      * @return 订单列表

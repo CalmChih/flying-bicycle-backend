@@ -53,6 +53,16 @@ public class OrderController {
         return orderService.pickupBicycle(searchMap);
     }
 
+    @PostMapping("/returnBicycle")
+    public ApiResponse returnBicycle(@RequestBody Map<String, Object> searchMap) {
+        return orderService.returnBicycle(searchMap);
+    }
+
+    @PostMapping("/applyForAfterSales")
+    public ApiResponse applyForAfterSales(@RequestBody OrderGoodsDTO orderGoodsDTO) {
+        return orderService.applyForAfterSales(orderGoodsDTO);
+    }
+
     @PostMapping("/getOrderList")
     public ApiResponse getOrderList(@RequestBody Map<String, Object> searchMap) {
         String username = StpUtil.getLoginIdAsString();

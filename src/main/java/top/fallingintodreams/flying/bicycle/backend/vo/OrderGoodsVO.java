@@ -15,6 +15,8 @@ public class OrderGoodsVO {
     private BigDecimal totalPrice;
     private Date payTime;
     private Integer orderState;
+    private BigDecimal refundAmount;
+    private String refundReason;
     private Date createTime;
     private String goodsTitle;
     private String goodsImg;
