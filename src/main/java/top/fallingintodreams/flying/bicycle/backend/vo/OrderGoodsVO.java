@@ -9,15 +9,15 @@ import java.util.Date;
 public class OrderGoodsVO {
 
     private String orderId;
+    private String username;
     private Date reservationStartTime;
     private Date reservationEndTime;
     private Integer reservationDays;
     private BigDecimal totalPrice;
     private Date payTime;
     private Integer orderState;
-    private BigDecimal refundAmount;
-    private String refundReason;
     private Date createTime;
+    private Long goodsId;
     private String goodsTitle;
     private String goodsImg;
     private String goodsDesc;

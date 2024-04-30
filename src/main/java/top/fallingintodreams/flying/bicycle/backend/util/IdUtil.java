@@ -1,7 +1,7 @@
 package top.fallingintodreams.flying.bicycle.backend.util;
 
+import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.RandomUtil;
-import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.Calendar;
 import java.util.Random;
@@ -36,6 +36,7 @@ public class IdUtil {
     }
 
     public static String generateOrderId() {
-        return RandomStringUtils.randomNumeric(19);
+        Snowflake snowflake = cn.hutool.core.util.IdUtil.getSnowflake();
+        return String.valueOf(snowflake.nextId());
     }
 }

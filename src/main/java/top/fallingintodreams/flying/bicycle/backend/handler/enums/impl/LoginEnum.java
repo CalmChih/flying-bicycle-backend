@@ -18,7 +18,7 @@ public enum LoginEnum implements IBaseExceptionInfo {
     /**
      * 账号不存在，请使用验证码登录
      */
-    ACCOUNT_DOES_NOT_EXIST("103", "账号不存在，请使用验证码登录"),
+    USER_ACCOUNT_NOT_EXIST("103", "用户账号不存在，请使用验证码登录"),
     /**
      * 邮箱格式错误
      */
@@ -27,7 +27,9 @@ public enum LoginEnum implements IBaseExceptionInfo {
     /**
      * 验证码发送失败
      */
-    CAPTCHA_SEND_ERROR("105", "验证码发送失败");
+    CAPTCHA_SEND_ERROR("105", "验证码发送失败"),
+    ACCOUNT_OR_PASSWORD_IS_BLANK("106", "账号或密码不能为空"),
+    ADMIN_ACCOUNT_NOT_EXITS("107", "账号不存在");
 
     private final String errCode;
     private final String errMsg;

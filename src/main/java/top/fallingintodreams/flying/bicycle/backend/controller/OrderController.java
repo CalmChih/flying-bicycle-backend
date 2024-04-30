@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import top.fallingintodreams.flying.bicycle.backend.common.ApiResponse;
 import top.fallingintodreams.flying.bicycle.backend.dto.OrderDTO;
 import top.fallingintodreams.flying.bicycle.backend.dto.OrderGoodsDTO;
+import top.fallingintodreams.flying.bicycle.backend.po.AfterSales;
 import top.fallingintodreams.flying.bicycle.backend.po.Order;
 import top.fallingintodreams.flying.bicycle.backend.service.OrderService;
 import top.fallingintodreams.flying.bicycle.backend.vo.OrderStateCountVO;
@@ -59,15 +60,13 @@ public class OrderController {
     }
 
     @PostMapping("/applyForAfterSales")
-    public ApiResponse applyForAfterSales(@RequestBody OrderGoodsDTO orderGoodsDTO) {
-        return orderService.applyForAfterSales(orderGoodsDTO);
+    public ApiResponse applyForAfterSales(@RequestBody AfterSales afterSales) {
+        return orderService.applyForAfterSales(afterSales);
     }
 
     @PostMapping("/getOrderList")
     public ApiResponse getOrderList(@RequestBody Map<String, Object> searchMap) {
-        String username = StpUtil.getLoginIdAsString();
-        searchMap.put("username", username);
-        List<OrderGoodsDTO> orderList = orderService.getOrderList(searchMap);
+        Map<String, Object> orderList = orderService.getOrderList(searchMap);
         return ApiResponse.success(orderList);
     }
 

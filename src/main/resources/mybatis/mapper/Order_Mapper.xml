@@ -12,8 +12,6 @@
         <result column="reservation_days" property="reservationDays"/>
         <result column="total_price" property="totalPrice"/>
         <result column="pay_time" property="payTime"/>
-        <result column="refund_amount" property="refundAmount"/>
-        <result column="refund_reason" property="refundReason"/>
         <result column="order_state" property="orderState"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
@@ -34,13 +32,7 @@
                 pay_time = #{payTime}
             </if>
             <if test="orderState != null">
-                order_state = #{orderState}
-            </if>
-            <if test="refundAmount != null">
-                , refund_amount = #{refundAmount}
-            </if>
-            <if test="refundReason != null and refundReason != ''">
-                , refund_reason = #{refundReason}
+                , order_state = #{orderState}
             </if>
         </set>
         WHERE order_id = #{orderId}
@@ -48,29 +40,34 @@
 
     <select id="getOrderList" resultType="top.fallingintodreams.flying.bicycle.backend.vo.OrderGoodsVO">
         SELECT o.order_id orderId,
+        o.username,
         o.reservation_start_time reservationStartTime,
         o.reservation_end_time reservationEndTime,
         o.reservation_days reservationDays,
         o.total_price totalPrice,
         o.pay_time payTime,
         o.order_state orderState,
-        o.refund_amount refundAmount,
-        o.refund_reason refundReason,
         o.create_time createTime,
+        g.goods_id goodsId,
         g.goods_title goodsTitle,
         g.goods_img goodsImg,
         g.goods_desc goodsDesc
         FROM `order` o LEFT JOIN goods g on g.goods_id = o.goods_id
-        WHERE username = #{username}
-        <if test="orderStates != null and orderStates != ''">
-            AND order_state IN (${orderStates})
-        </if>
+        <where>
+            <if test="username != null and username != ''">
+                username = #{username}
+            </if>
+            <if test="orderStates != null and orderStates != ''">
+                AND order_state IN (${orderStates})
+            </if>
+        </where>
         ORDER BY o.create_time DESC
     </select>
 
     <select id="getOrderInfo" parameterType="string"
             resultType="top.fallingintodreams.flying.bicycle.backend.vo.OrderGoodsVO">
         SELECT o.order_id               orderId,
+               o.username,
                o.reservation_start_time reservationStartTime,
                o.reservation_end_time   reservationEndTime,
                o.reservation_days       reservationDays,
@@ -78,6 +75,7 @@
                o.pay_time               payTime,
                o.order_state            orderState,
                o.create_time            createTime,
+               g.goods_id goodsId,
                g.goods_title            goodsTitle,
                g.goods_desc             goodsDesc,
                g.goods_price            goodsPrice,

@@ -9,11 +9,11 @@ import com.alipay.api.domain.AlipayTradeWapPayModel;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipayTradeWapPayRequest;
 import com.alipay.api.response.AlipayTradeWapPayResponse;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.io.ClassPathResource;
@@ -23,14 +23,16 @@ import org.springframework.stereotype.Repository;
 import top.fallingintodreams.flying.bicycle.backend.common.ApiResponse;
 import top.fallingintodreams.flying.bicycle.backend.common.Constant;
 import top.fallingintodreams.flying.bicycle.backend.config.MyAlipayConfig;
-import top.fallingintodreams.flying.bicycle.backend.dao.IGoodsDao;
+import top.fallingintodreams.flying.bicycle.backend.dao.IAfterSalesDao;
 import top.fallingintodreams.flying.bicycle.backend.dao.IOrderDao;
 import top.fallingintodreams.flying.bicycle.backend.dto.OrderDTO;
 import top.fallingintodreams.flying.bicycle.backend.dto.OrderGoodsDTO;
+import top.fallingintodreams.flying.bicycle.backend.po.AfterSales;
 import top.fallingintodreams.flying.bicycle.backend.po.Goods;
 import top.fallingintodreams.flying.bicycle.backend.po.Order;
 import top.fallingintodreams.flying.bicycle.backend.service.GoodsService;
 import top.fallingintodreams.flying.bicycle.backend.service.OrderService;
+import top.fallingintodreams.flying.bicycle.backend.util.DateConvertUtils;
 import top.fallingintodreams.flying.bicycle.backend.util.IdUtil;
 import top.fallingintodreams.flying.bicycle.backend.util.RedisUtil;
 import top.fallingintodreams.flying.bicycle.backend.vo.OrderGoodsVO;
@@ -43,6 +45,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 订单 服务实现类
@@ -57,7 +60,7 @@ public class OrderServiceImpl implements OrderService {
     @Resource
     private IOrderDao orderDao;
     @Resource
-    private IGoodsDao goodsDao;
+    private IAfterSalesDao afterSalesDao;
 
     @Resource
     private GoodsService goodsService;
@@ -128,7 +131,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public ApiResponse cancelOrder(Map<String, Object> searchMap) {
-        Date reservationStartTime = formatToDate(searchMap.get("reservationStartTime").toString());
+        Date reservationStartTime = DateConvertUtils.formatToDate(searchMap.get("reservationStartTime").toString());
         Date nowDate = DateUtils.addSeconds(new Date(), -1);
         String orderState = searchMap.get("orderState").toString();
         if (!Constant.OrderStateEnum.UNPAID.getStateValue().equals(orderState) && nowDate.after(reservationStartTime)) {
@@ -143,13 +146,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public ApiResponse pickupBicycle(Map<String, Object> searchMap) {
-        Date reservationStartTime = formatToDate(searchMap.get("reservationStartTime").toString());
+        Date reservationStartTime = DateConvertUtils.formatToDate(searchMap.get("reservationStartTime").toString());
         Date canPickupTime = DateUtils.addMinutes(reservationStartTime, -10);
         Date nowDate = new Date();
         if (nowDate.before(canPickupTime)) {
             return ApiResponse.error("最多仅可提前10分钟取车");
         }
-        Date reservationEndTime = formatToDate(searchMap.get("reservationEndTime").toString());
+        Date reservationEndTime = DateConvertUtils.formatToDate(searchMap.get("reservationEndTime").toString());
         if (nowDate.after(reservationEndTime)) {
             Order order = new Order();
             order.setOrderState(Constant.OrderStateEnum.VEHICLES_RETURNED.getStateCode());
@@ -174,24 +177,26 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ApiResponse applyForAfterSales(OrderGoodsDTO orderGoodsDTO) {
-        Order order = new Order();
-        order.setOrderId(orderGoodsDTO.getOrderId());
-        order.setRefundAmount(orderGoodsDTO.getRefundAmount());
-        order.setRefundReason(orderGoodsDTO.getRefundReason());
-        order.setOrderState(Constant.OrderStateEnum.APPLY_FOR_AFTER_SALES.getStateCode());
-        orderDao.updateOrder(order);
+    public ApiResponse applyForAfterSales(AfterSales afterSales) {
+        afterSalesDao.insertAfterSalesInfo(afterSales);
         return ApiResponse.success();
     }
 
     @Override
-    public List<OrderGoodsDTO> getOrderList(Map<String, Object> searchMap) {
+    public Map<String, Object> getOrderList(Map<String, Object> searchMap) {
+        if (searchMap.get("currentPage") != null && searchMap.get("pageSize") != null) {
+            int currentPage = (int) searchMap.get("currentPage");
+            int pageSize = (int) searchMap.get("pageSize");
+            PageHelper.startPage(currentPage, pageSize);
+        }
         List<OrderGoodsVO> orderList = orderDao.getOrderList(searchMap);
         List<OrderGoodsDTO> orderGoodsDTOList = new ArrayList<>();
-        orderList.forEach(orderGoodsVO -> {
-            orderGoodsDTOList.add(convert2DTO(orderGoodsVO));
-        });
-        return orderGoodsDTOList;
+        orderList.forEach(orderGoodsVO -> orderGoodsDTOList.add(convert2DTO(orderGoodsVO)));
+        PageInfo<OrderGoodsVO> pageInfo = new PageInfo<>(orderList);
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("list", orderGoodsDTOList);
+        resultMap.put("total", pageInfo.getTotal());
+        return resultMap;
     }
 
     @Override
@@ -202,16 +207,19 @@ public class OrderServiceImpl implements OrderService {
 
     private OrderGoodsDTO convert2DTO(OrderGoodsVO orderGoodsVO) {
         OrderGoodsDTO orderGoodsDTO = new OrderGoodsDTO();
+        if (Objects.isNull(orderGoodsVO)) {
+            return null;
+        }
         orderGoodsDTO.setOrderId(orderGoodsVO.getOrderId());
-        orderGoodsDTO.setReservationStartTime(dateFormatToString(orderGoodsVO.getReservationStartTime()));
-        orderGoodsDTO.setReservationEndTime(dateFormatToString(orderGoodsVO.getReservationEndTime()));
+        orderGoodsDTO.setUsername(orderGoodsVO.getUsername());
+        orderGoodsDTO.setReservationStartTime(DateConvertUtils.dateFormatToString(orderGoodsVO.getReservationStartTime()));
+        orderGoodsDTO.setReservationEndTime(DateConvertUtils.dateFormatToString(orderGoodsVO.getReservationEndTime()));
         orderGoodsDTO.setReservationDays(orderGoodsVO.getReservationDays());
         orderGoodsDTO.setTotalPrice(orderGoodsVO.getTotalPrice());
-        orderGoodsDTO.setPayTime(dateFormatToString(orderGoodsVO.getPayTime()));
+        orderGoodsDTO.setPayTime(DateConvertUtils.dateFormatToString(orderGoodsVO.getPayTime()));
         orderGoodsDTO.setOrderState(Constant.OrderStateEnum.convert(orderGoodsVO.getOrderState()));
-        orderGoodsDTO.setRefundAmount(orderGoodsVO.getRefundAmount());
-        orderGoodsDTO.setRefundReason(orderGoodsVO.getRefundReason());
-        orderGoodsDTO.setCreateTime(dateFormatToString(orderGoodsVO.getCreateTime()));
+        orderGoodsDTO.setCreateTime(DateConvertUtils.dateFormatToString(orderGoodsVO.getCreateTime()));
+        orderGoodsDTO.setGoodsId(orderGoodsVO.getGoodsId());
         orderGoodsDTO.setGoodsTitle(orderGoodsVO.getGoodsTitle());
         orderGoodsDTO.setGoodsImg(orderGoodsVO.getGoodsImg());
         orderGoodsDTO.setGoodsDesc(orderGoodsVO.getGoodsDesc());
@@ -227,7 +235,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public String payOrder(String orderId) {
         OrderGoodsVO orderGoodsVO = orderDao.getOrderInfo(orderId);
-        AlipayClient alipayClient = null;
+        AlipayClient alipayClient;
         try {
             alipayClient = new DefaultAlipayClient(alipayConfig);
         } catch (AlipayApiException e) {
@@ -250,7 +258,7 @@ public class OrderServiceImpl implements OrderService {
     private AlipayTradeWapPayRequest getAlipayTradeWapPayRequest(OrderGoodsVO orderGoodsVO) {
         AlipayTradeWapPayRequest request = new AlipayTradeWapPayRequest();
         request.setNotifyUrl(myAlipayConfig.getNotifyUrl());
-        request.setReturnUrl("http://localhost:5173/user");
+        request.setReturnUrl("http://localhost:8026/user");
         AlipayTradeWapPayModel model = new AlipayTradeWapPayModel();
         model.setOutTradeNo(orderGoodsVO.getOrderId());
         model.setTotalAmount(orderGoodsVO.getTotalPrice().toString());
@@ -270,7 +278,7 @@ public class OrderServiceImpl implements OrderService {
         }
         String sign = params.get("sign");
         String signatureContent = AlipaySignature.getSignCheckContentV1(params);
-        boolean checkContent = false;
+        boolean checkContent;
         try {
             checkContent = AlipaySignature.rsa256CheckContent(signatureContent, sign, alipayConfig.getAlipayPublicKey(), alipayConfig.getCharset());
         } catch (AlipayApiException e) {
@@ -294,21 +302,4 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
-    private String dateFormatToString(Date date) {
-        if (date == null) {
-            return null;
-        }
-        return DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss");
-    }
-
-    private Date formatToDate(String dateStr) {
-        if (StringUtils.isBlank(dateStr)) {
-            throw new IllegalArgumentException("时间字符串不能为空");
-        }
-        try {
-            return DateUtils.parseDate(dateStr, "yyyy-MM-dd HH:mm:ss");
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

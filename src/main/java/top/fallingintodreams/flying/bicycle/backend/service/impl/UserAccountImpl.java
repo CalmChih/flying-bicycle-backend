@@ -39,7 +39,7 @@ public class UserAccountImpl implements UserAccountService {
         }
         String password = userAccountDao.getPassword(userAccountDTO);
         if (StringUtils.isBlank(password)) {
-            throw new LoginException(LoginEnum.ACCOUNT_DOES_NOT_EXIST);
+            throw new LoginException(LoginEnum.USER_ACCOUNT_NOT_EXIST);
         }
         boolean flag = BCrypt.checkpw(userAccountDTO.getPassword(), password);
         if (!flag) {

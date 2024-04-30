@@ -84,6 +84,36 @@ public class Constant {
 
     }
 
+    @Getter
+    public enum AfterSalesStateEnum {
+        /**
+         * 售后中
+         */
+        WAITING_AFTER_SALES(1, "售后中"),
+        /**
+         * 售后成功
+         */
+        AFTER_SALES_SUCCESS(2, "售后成功");
+
+        private final Integer stateCode;
+        private final String stateValue;
+
+        AfterSalesStateEnum(Integer stateCode, String stateValue) {
+            this.stateCode = stateCode;
+            this.stateValue = stateValue;
+        }
+
+        private static final Map<Integer, String> outAfterSalesStateMap = new HashMap<>();
+        static {
+            outAfterSalesStateMap.put(WAITING_AFTER_SALES.getStateCode(), WAITING_AFTER_SALES.getStateValue());
+            outAfterSalesStateMap.put(AFTER_SALES_SUCCESS.getStateCode(), AFTER_SALES_SUCCESS.getStateValue());
+        }
+        public static String convert(Integer afterSalesState) {
+            return outAfterSalesStateMap.get(afterSalesState);
+        }
+
+    }
+
     public static final class UserState {
 
         /**
