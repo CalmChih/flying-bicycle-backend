@@ -93,7 +93,8 @@ public class Constant {
         /**
          * 售后成功
          */
-        AFTER_SALES_SUCCESS(2, "售后成功");
+        AFTER_SALES_SUCCESS(2, "售后成功"),
+        REJECTED(3, "已拒绝");
 
         private final Integer stateCode;
         private final String stateValue;
@@ -107,6 +108,7 @@ public class Constant {
         static {
             outAfterSalesStateMap.put(WAITING_AFTER_SALES.getStateCode(), WAITING_AFTER_SALES.getStateValue());
             outAfterSalesStateMap.put(AFTER_SALES_SUCCESS.getStateCode(), AFTER_SALES_SUCCESS.getStateValue());
+            outAfterSalesStateMap.put(REJECTED.getStateCode(), REJECTED.getStateValue());
         }
         public static String convert(Integer afterSalesState) {
             return outAfterSalesStateMap.get(afterSalesState);
@@ -180,7 +182,11 @@ public class Constant {
         /**
          * 请求路径错误
          */
-        PATH_ERROR("1002", "请求路径错误");
+        PATH_ERROR("1002", "请求路径错误"),
+        /**
+         * 支付宝接口调用异常
+         */
+        ALIPAY_API_EXCEPTION("1003", "支付宝接口调用异常");
 
         private final String code;
         private final String msg;

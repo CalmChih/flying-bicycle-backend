@@ -84,6 +84,12 @@ public class LoginController {
         return ApiResponse.success(tokenInfo, "登录成功");
     }
 
+    @GetMapping("/adminCheckLogin")
+    public ApiResponse adminCheckLogin() {
+        boolean isLogin = StpUtil.isLogin();
+        return ApiResponse.success(isLogin);
+    }
+
     @PostMapping("/logout")
     public ApiResponse isLogin() {
         StpUtil.logout();

@@ -33,6 +33,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/image/**")
-                .addResourceLocations("file:D:/bishe/flying-bicycle/src/assets/images/");
+                .addResourceLocations("file:D:/bishe/flying-bicycle/src/assets/images/",
+                        "file:D:/bishe/flying-bicycle-admin/src/assets/images/");
     }
 }

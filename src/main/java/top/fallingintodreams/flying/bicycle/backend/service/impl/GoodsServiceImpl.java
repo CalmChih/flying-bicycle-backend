@@ -59,6 +59,12 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
+    public void updateGoodsNum(Goods goods) {
+        redisUtil.deleteKeysWithPrefix(Constant.RedisKey.VALID_GOODS_LIST_PREFIX);
+        goodsDao.updateGoods(goods);
+    }
+
+    @Override
     public Map<String, Object> getGoodsList(Map<String, Object> searchMap) {
         Map<String, Object> resultMap = new HashMap<>();
         int currentPage = (int) searchMap.get("currentPage");

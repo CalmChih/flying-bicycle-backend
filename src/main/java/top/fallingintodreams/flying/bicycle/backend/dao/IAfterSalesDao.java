@@ -2,6 +2,7 @@ package top.fallingintodreams.flying.bicycle.backend.dao;
 
 import org.apache.ibatis.annotations.Mapper;
 import top.fallingintodreams.flying.bicycle.backend.po.AfterSales;
+import top.fallingintodreams.flying.bicycle.backend.vo.AfterSalesVO;
 
 import java.util.List;
 
@@ -24,6 +25,8 @@ public interface IAfterSalesDao {
     void updateAfterSalesInfo(AfterSales afterSales);
 
 
-    List<AfterSales> getAfterSalesList();
+    List<AfterSalesVO> getAfterSalesList();
+
+    AfterSalesVO getAfterSalesByOrderId(String orderId);
 
 }

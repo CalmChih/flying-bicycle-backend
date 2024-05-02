@@ -1,6 +1,5 @@
 package top.fallingintodreams.flying.bicycle.backend.service.impl;
 
-import com.alibaba.fastjson2.JSON;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.AlipayConfig;
@@ -23,11 +22,9 @@ import org.springframework.stereotype.Repository;
 import top.fallingintodreams.flying.bicycle.backend.common.ApiResponse;
 import top.fallingintodreams.flying.bicycle.backend.common.Constant;
 import top.fallingintodreams.flying.bicycle.backend.config.MyAlipayConfig;
-import top.fallingintodreams.flying.bicycle.backend.dao.IAfterSalesDao;
 import top.fallingintodreams.flying.bicycle.backend.dao.IOrderDao;
 import top.fallingintodreams.flying.bicycle.backend.dto.OrderDTO;
 import top.fallingintodreams.flying.bicycle.backend.dto.OrderGoodsDTO;
-import top.fallingintodreams.flying.bicycle.backend.po.AfterSales;
 import top.fallingintodreams.flying.bicycle.backend.po.Goods;
 import top.fallingintodreams.flying.bicycle.backend.po.Order;
 import top.fallingintodreams.flying.bicycle.backend.service.GoodsService;
@@ -59,8 +56,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Resource
     private IOrderDao orderDao;
-    @Resource
-    private IAfterSalesDao afterSalesDao;
 
     @Resource
     private GoodsService goodsService;
@@ -177,12 +172,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ApiResponse applyForAfterSales(AfterSales afterSales) {
-        afterSalesDao.insertAfterSalesInfo(afterSales);
-        return ApiResponse.success();
-    }
-
-    @Override
     public Map<String, Object> getOrderList(Map<String, Object> searchMap) {
         if (searchMap.get("currentPage") != null && searchMap.get("pageSize") != null) {
             int currentPage = (int) searchMap.get("currentPage");
@@ -241,7 +230,6 @@ public class OrderServiceImpl implements OrderService {
         } catch (AlipayApiException e) {
             throw new RuntimeException(e);
         }
-        log.info("配置：{}", JSON.toJSONString(alipayConfig));
 
         AlipayTradeWapPayRequest request = getAlipayTradeWapPayRequest(orderGoodsVO);
         AlipayTradeWapPayResponse response;
@@ -250,7 +238,6 @@ public class OrderServiceImpl implements OrderService {
         } catch (AlipayApiException e) {
             throw new RuntimeException(e);
         }
-        log.info(response.getBody());
         return response.getBody();
     }
 

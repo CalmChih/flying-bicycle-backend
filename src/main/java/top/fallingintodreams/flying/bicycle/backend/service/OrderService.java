@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import top.fallingintodreams.flying.bicycle.backend.common.ApiResponse;
 import top.fallingintodreams.flying.bicycle.backend.dto.OrderDTO;
 import top.fallingintodreams.flying.bicycle.backend.dto.OrderGoodsDTO;
-import top.fallingintodreams.flying.bicycle.backend.po.AfterSales;
 import top.fallingintodreams.flying.bicycle.backend.po.Order;
 import top.fallingintodreams.flying.bicycle.backend.vo.OrderStateCountVO;
 
@@ -35,8 +34,6 @@ public interface OrderService {
     ApiResponse pickupBicycle(Map<String, Object> searchMap);
 
     ApiResponse returnBicycle(Map<String, Object> searchMap);
-
-    ApiResponse applyForAfterSales(AfterSales afterSales);
 
     /**
      * 获取订单列表 分页

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import top.fallingintodreams.flying.bicycle.backend.common.ApiResponse;
 import top.fallingintodreams.flying.bicycle.backend.dto.OrderDTO;
 import top.fallingintodreams.flying.bicycle.backend.dto.OrderGoodsDTO;
-import top.fallingintodreams.flying.bicycle.backend.po.AfterSales;
 import top.fallingintodreams.flying.bicycle.backend.po.Order;
 import top.fallingintodreams.flying.bicycle.backend.service.OrderService;
 import top.fallingintodreams.flying.bicycle.backend.vo.OrderStateCountVO;
@@ -57,11 +56,6 @@ public class OrderController {
     @PostMapping("/returnBicycle")
     public ApiResponse returnBicycle(@RequestBody Map<String, Object> searchMap) {
         return orderService.returnBicycle(searchMap);
-    }
-
-    @PostMapping("/applyForAfterSales")
-    public ApiResponse applyForAfterSales(@RequestBody AfterSales afterSales) {
-        return orderService.applyForAfterSales(afterSales);
     }
 
     @PostMapping("/getOrderList")

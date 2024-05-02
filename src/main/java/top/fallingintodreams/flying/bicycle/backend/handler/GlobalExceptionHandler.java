@@ -1,6 +1,7 @@
 package top.fallingintodreams.flying.bicycle.backend.handler;
 
 import cn.dev33.satoken.exception.NotLoginException;
+import com.alipay.api.AlipayApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -43,6 +44,13 @@ public class GlobalExceptionHandler {
         log.error("没有该资源", e);
         return ApiResponse.error(Constant.ResponseCodeEnum.PATH_ERROR.getCode(),
                 Constant.ResponseCodeEnum.PATH_ERROR.getMsg());
+    }
+
+    @ExceptionHandler(AlipayApiException.class)
+    public ApiResponse noResourceFoundException(AlipayApiException e) {
+        log.error("支付宝接口调用异常", e);
+        return ApiResponse.error(Constant.ResponseCodeEnum.ALIPAY_API_EXCEPTION.getCode(),
+                Constant.ResponseCodeEnum.ALIPAY_API_EXCEPTION.getMsg());
     }
 
     @ExceptionHandler(Exception.class)

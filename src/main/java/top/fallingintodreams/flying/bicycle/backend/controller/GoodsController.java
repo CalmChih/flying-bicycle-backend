@@ -1,5 +1,6 @@
 package top.fallingintodreams.flying.bicycle.backend.controller;
 
+import cn.hutool.core.lang.UUID;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,10 +9,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import top.fallingintodreams.flying.bicycle.backend.common.ApiResponse;
 import top.fallingintodreams.flying.bicycle.backend.po.Goods;
 import top.fallingintodreams.flying.bicycle.backend.service.GoodsService;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +32,20 @@ public class GoodsController {
     @Resource
     private GoodsService goodsService;
 
+    @PostMapping("/uploadImg")
+    public ApiResponse uploadAvatar(@RequestParam MultipartFile file) {
+        String originalFilename = file.getOriginalFilename();
+        String ext = originalFilename.substring(originalFilename.lastIndexOf("."));
+        String newFileName = UUID.randomUUID() + ext;
+        File localFile = new File("D:/bishe/flying-bicycle-admin/src/assets/images/" + newFileName);
+        try {
+            file.transferTo(localFile);
+        } catch (IOException e) {
+            return ApiResponse.error("上传失败");
+        }
+        return ApiResponse.success("http://localhost:8002/image/" + newFileName, "上传成功");
+    }
+
     @PostMapping("/insertGoods")
     public ApiResponse insertGoods(@RequestBody Goods goods) {
         goodsService.insertGoods(goods);
@@ -37,6 +55,12 @@ public class GoodsController {
     @PostMapping("/updateGoods")
     public ApiResponse updateGoods(@RequestBody Goods goods) {
         goodsService.updateGoods(goods);
+        return ApiResponse.success("更新成功");
+    }
+
+    @PostMapping("/updateGoodsNum")
+    public ApiResponse updateGoodsNum(@RequestBody Goods goods) {
+        goodsService.updateGoodsNum(goods);
         return ApiResponse.success("更新成功");
     }
 

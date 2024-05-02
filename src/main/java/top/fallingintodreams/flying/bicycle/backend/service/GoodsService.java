@@ -25,6 +25,8 @@ public interface GoodsService {
      */
     void updateGoods(Goods goods);
 
+    void updateGoodsNum(Goods goods);
+
     /**
      * 获取商品列表 分页
      * @param searchMap 查询参数

@@ -18,8 +18,10 @@
     </resultMap>
 
     <insert id="insertGoods" parameterType="top.fallingintodreams.flying.bicycle.backend.po.Goods">
-        INSERT INTO goods (goods_id, goods_title, goods_desc, goods_num, category_id, goods_tags, goods_img, create_time, update_time)
-        VALUES (#{goodsId}, #{goodsTitle}, #{goodsDesc}, #{goodsNum}, #{categoryId}, #{goodsTags}, #{goodsImg}, NOW(), NOW())
+        INSERT INTO goods (goods_id, goods_title, goods_desc, goods_price, goods_num, category_id, goods_tags,
+                           goods_img, create_time, update_time)
+        VALUES (#{goodsId}, #{goodsTitle}, #{goodsDesc}, #{goodsPrice}, #{goodsNum}, #{categoryId}, #{goodsTags},
+                #{goodsImg}, NOW(), NOW())
     </insert>
 
     <update id="updateGoods" parameterType="top.fallingintodreams.flying.bicycle.backend.po.Goods">
@@ -31,10 +33,13 @@
             <if test="goodsDesc != null and goodsDesc != ''">
                 goods_desc = #{goodsDesc},
             </if>
-            <if test="goodsNum != null and goodsNum != ''">
+            <if test="goodsPrice != null">
+                goods_price = #{goodsPrice},
+            </if>
+            <if test="goodsNum != null">
                 goods_num = #{goodsNum},
             </if>
-            <if test="categoryId != null and categoryId != ''">
+            <if test="categoryId != null">
                 category_id = #{categoryId},
             </if>
             <if test="goodsTags != null and goodsTags != ''">
@@ -60,7 +65,7 @@
         <if test="categoryId != null">
             AND category_id = #{categoryId}
         </if>
-        ORDER BY id
+        ORDER BY create_time DESC
     </select>
 
     <update id="deleteGoods">

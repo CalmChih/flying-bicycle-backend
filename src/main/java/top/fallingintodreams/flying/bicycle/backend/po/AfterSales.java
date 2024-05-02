@@ -12,8 +12,6 @@ public class AfterSales {
     private String orderId;
     private String username;
     private Long goodsId;
-    private String goodsTitle;
-    private BigDecimal totalPrice;
     private BigDecimal requestRefundAmount;
     private String refundReason;
     private BigDecimal actualRefundAmount;

@@ -7,8 +7,6 @@
         <result column="order_id" property="orderId"/>
         <result column="username" property="username"/>
         <result column="goods_id" property="goodsId"/>
-        <result column="goods_title" property="goodsTitle"/>
-        <result column="total_price" property="totalPrice"/>
         <result column="request_refund_amount" property="requestRefundAmount"/>
         <result column="refund_reason" property="refundReason"/>
         <result column="actual_refund_amount" property="actualRefundAmount"/>
@@ -19,17 +17,18 @@
     </resultMap>
 
     <insert id="insertAfterSalesInfo" parameterType="top.fallingintodreams.flying.bicycle.backend.po.AfterSales">
-        INSERT INTO after_sales (order_id, username, goods_id, goods_title, total_price, request_refund_amount,
-                                 refund_reason, actual_refund_amount, seller_reply, state, create_time, update_time)
-        VALUES (#{orderId}, #{username}, #{goodsId}, #{goodsTitle}, #{totalPrice}, #{requestRefundAmount},
-                #{refundReason}, #{actualRefundAmount}, #{sellerReply}, #{state}, NOW(), NOW())
+        INSERT INTO after_sales (order_id, username, goods_id, request_refund_amount,
+                                 refund_reason, state, create_time, update_time)
+        VALUES (#{orderId}, #{username}, #{goodsId}, #{requestRefundAmount},
+                #{refundReason}, #{state}, NOW(), NOW())
     </insert>
 
     <update id="updateAfterSalesInfo" parameterType="top.fallingintodreams.flying.bicycle.backend.po.AfterSales">
         UPDATE after_sales
         <set>
+            state = #{state}
             <if test="actualRefundAmount != null">
-                actual_refund_amount = #{actualRefundAmount}
+                , actual_refund_amount = #{actualRefundAmount}
             </if>
             <if test="sellerReply != null and sellerReply != ''">
                 , seller_reply = #{sellerReply}
@@ -38,25 +37,57 @@
         WHERE order_id = #{orderId}
     </update>
 
-    <select id="getAfterSalesList" resultMap="afterSalesMap">
-        SELECT order_id,
-        username,
-        goods_id,
-        goods_title,
-        total_price,
-        request_refund_amount,
-        refund_reason,
-        actual_refund_amount,
-        seller_reply,
-        state,
-        create_time
-        FROM after_sales
+    <select id="getAfterSalesList" resultType="top.fallingintodreams.flying.bicycle.backend.vo.AfterSalesVO">
+        SELECT sales.order_id orderId,
+        sales.username,
+        sales.goods_id goodsId,
+        gs.goods_title goodsTitle,
+        gs.goods_desc goodsDesc,
+        gs.goods_img goodsImg,
+        gs.goods_price goodsPrice,
+        od.total_price totalPrice,
+        od.pay_time payTime,
+        od.reservation_start_time reservationStartTime,
+        od.reservation_end_time reservationEndTime,
+        sales.request_refund_amount requestRefundAmount,
+        sales.refund_reason refundReason,
+        sales.actual_refund_amount actualRefundAmount,
+        sales.seller_reply sellerReply,
+        sales.state,
+        sales.create_time createTime
+        FROM after_sales sales
+        LEFT JOIN goods gs on sales.goods_id = gs.goods_id
+        LEFT JOIN `order` od on sales.order_id = od.order_id
         <where>
             <if test="username != null and username != ''">
                 username = #{username}
             </if>
         </where>
-        ORDER BY create_time DESC
+        ORDER BY sales.create_time DESC
+    </select>
+
+    <select id="getAfterSalesByOrderId" resultType="top.fallingintodreams.flying.bicycle.backend.vo.AfterSalesVO">
+        SELECT sales.order_id              orderId,
+               sales.username,
+               sales.goods_id              goodsId,
+               gs.goods_title              goodsTitle,
+               gs.goods_desc               goodsDesc,
+               gs.goods_img                goodsImg,
+               gs.goods_price              goodsPrice,
+               od.total_price              totalPrice,
+               od.pay_time                 payTime,
+               od.reservation_start_time reservationStartTime,
+               od.reservation_end_time reservationEndTime,
+               sales.request_refund_amount requestRefundAmount,
+               sales.refund_reason         refundReason,
+               sales.actual_refund_amount  actualRefundAmount,
+               sales.seller_reply          sellerReply,
+               sales.state,
+               sales.create_time           createTime
+        FROM after_sales sales
+                 LEFT JOIN goods gs on sales.goods_id = gs.goods_id
+                 LEFT JOIN `order` od on sales.order_id = od.order_id
+        WHERE sales.order_id = #{orderId}
     </select>
 
 </mapper>
