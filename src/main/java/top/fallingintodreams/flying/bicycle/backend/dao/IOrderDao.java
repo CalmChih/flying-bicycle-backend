@@ -2,8 +2,10 @@ package top.fallingintodreams.flying.bicycle.backend.dao;
 
 import org.apache.ibatis.annotations.Mapper;
 import top.fallingintodreams.flying.bicycle.backend.po.Order;
+import top.fallingintodreams.flying.bicycle.backend.vo.GoodsRentalRankingVO;
 import top.fallingintodreams.flying.bicycle.backend.vo.OrderGoodsVO;
 import top.fallingintodreams.flying.bicycle.backend.vo.OrderStateCountVO;
+import top.fallingintodreams.flying.bicycle.backend.vo.OrderTrendVO;
 import top.fallingintodreams.flying.bicycle.backend.vo.ReservationGoodsVO;
 
 import java.util.List;
@@ -46,5 +48,9 @@ public interface IOrderDao {
     List<ReservationGoodsVO> getReservationGoodsNum(Map<String, Object> searchMap);
 
     List<OrderStateCountVO> getOrderCountGroupByState(String username);
+
+    List<GoodsRentalRankingVO> getGoodsRentalRanking();
+
+    List<OrderTrendVO> getOrderTrend(Map<String, Object> searchMap);
 
 }

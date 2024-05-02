@@ -32,10 +32,14 @@ import top.fallingintodreams.flying.bicycle.backend.service.OrderService;
 import top.fallingintodreams.flying.bicycle.backend.util.DateConvertUtils;
 import top.fallingintodreams.flying.bicycle.backend.util.IdUtil;
 import top.fallingintodreams.flying.bicycle.backend.util.RedisUtil;
+import top.fallingintodreams.flying.bicycle.backend.vo.GoodsRentalRankingVO;
 import top.fallingintodreams.flying.bicycle.backend.vo.OrderGoodsVO;
 import top.fallingintodreams.flying.bicycle.backend.vo.OrderStateCountVO;
+import top.fallingintodreams.flying.bicycle.backend.vo.OrderTrendVO;
 
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -43,6 +47,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 订单 服务实现类
@@ -219,6 +225,34 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderStateCountVO> getOrderCountGroupByState(String username) {
         return orderDao.getOrderCountGroupByState(username);
+    }
+
+    @Override
+    public List<GoodsRentalRankingVO> getGoodsRentalRanking() {
+        return orderDao.getGoodsRentalRanking();
+    }
+
+    @Override
+    public List<OrderTrendVO> getOrderTrend(Map<String, Object> searchMap) {
+        String startTime = searchMap.get("startTime").toString();
+        String endTime = searchMap.get("endTime").toString();
+        LocalDate localStartTime = LocalDate.parse(startTime);
+        LocalDate localEndTime = LocalDate.parse(endTime);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        List<String> dateList = new ArrayList<>();
+        for (LocalDate currentDate = localStartTime; !currentDate.isAfter(localEndTime); currentDate = currentDate.plusDays(1)) {
+
+            dateList.add(currentDate.format(dateTimeFormatter));
+        }
+        List<OrderTrendVO> orderTrend = orderDao.getOrderTrend(searchMap);
+        Map<String, OrderTrendVO> orderTrendMap = orderTrend.stream()
+                .collect(Collectors.toMap(OrderTrendVO::getDate, Function.identity()));
+        List<OrderTrendVO> result = new ArrayList<>();
+        dateList.forEach(date -> {
+            OrderTrendVO orderTrendVO = orderTrendMap.getOrDefault(date, new OrderTrendVO(date, 0));
+            result.add(orderTrendVO);
+        });
+        return result;
     }
 
     @Override

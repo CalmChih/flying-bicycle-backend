@@ -14,7 +14,9 @@ import top.fallingintodreams.flying.bicycle.backend.dto.OrderDTO;
 import top.fallingintodreams.flying.bicycle.backend.dto.OrderGoodsDTO;
 import top.fallingintodreams.flying.bicycle.backend.po.Order;
 import top.fallingintodreams.flying.bicycle.backend.service.OrderService;
+import top.fallingintodreams.flying.bicycle.backend.vo.GoodsRentalRankingVO;
 import top.fallingintodreams.flying.bicycle.backend.vo.OrderStateCountVO;
+import top.fallingintodreams.flying.bicycle.backend.vo.OrderTrendVO;
 
 import java.util.List;
 import java.util.Map;
@@ -75,6 +77,18 @@ public class OrderController {
         String username = StpUtil.getLoginIdAsString();
         List<OrderStateCountVO> orderCountGroupByState = orderService.getOrderCountGroupByState(username);
         return ApiResponse.success(orderCountGroupByState);
+    }
+
+    @GetMapping("/getGoodsRentalRanking")
+    public ApiResponse getGoodsRentalRanking() {
+        List<GoodsRentalRankingVO> goodsRentalRanking = orderService.getGoodsRentalRanking();
+        return ApiResponse.success(goodsRentalRanking);
+    }
+
+    @PostMapping("/getOrderTrend")
+    public ApiResponse getOrderTrend(@RequestBody Map<String, Object> searchMap) {
+        List<OrderTrendVO> orderTrend = orderService.getOrderTrend(searchMap);
+        return ApiResponse.success(orderTrend);
     }
 
     @GetMapping("/pay")

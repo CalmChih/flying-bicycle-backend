@@ -5,7 +5,9 @@ import top.fallingintodreams.flying.bicycle.backend.common.ApiResponse;
 import top.fallingintodreams.flying.bicycle.backend.dto.OrderDTO;
 import top.fallingintodreams.flying.bicycle.backend.dto.OrderGoodsDTO;
 import top.fallingintodreams.flying.bicycle.backend.po.Order;
+import top.fallingintodreams.flying.bicycle.backend.vo.GoodsRentalRankingVO;
 import top.fallingintodreams.flying.bicycle.backend.vo.OrderStateCountVO;
+import top.fallingintodreams.flying.bicycle.backend.vo.OrderTrendVO;
 
 import java.util.List;
 import java.util.Map;
@@ -51,6 +53,10 @@ public interface OrderService {
     OrderGoodsDTO getOrderInfo(String orderId);
 
     List<OrderStateCountVO> getOrderCountGroupByState(String username);
+
+    List<GoodsRentalRankingVO> getGoodsRentalRanking();
+
+    List<OrderTrendVO> getOrderTrend(Map<String, Object> searchMap);
 
     String payOrder(String orderId);
 

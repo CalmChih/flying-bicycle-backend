@@ -101,4 +101,19 @@
         WHERE username = #{username}
         GROUP BY order_state
     </select>
+
+    <select id="getGoodsRentalRanking" resultType="top.fallingintodreams.flying.bicycle.backend.vo.GoodsRentalRankingVO">
+        SELECT goods_title goodsTitle, COUNT(*) totalCount
+        FROM `order` od
+            LEFT JOIN goods gs ON od.goods_id = gs.goods_id
+        GROUP BY od.goods_id ORDER BY totalCount DESC LIMIT 10
+    </select>
+
+    <select id="getOrderTrend" parameterType="hashmap" resultType="top.fallingintodreams.flying.bicycle.backend.vo.OrderTrendVO">
+        SELECT DATE(create_time) date, COUNT(*) totalCOunt
+        FROM `order`
+        WHERE create_time BETWEEN #{startTime} AND #{endTime}
+        GROUP BY date
+        ORDER BY date
+    </select>
 </mapper>
