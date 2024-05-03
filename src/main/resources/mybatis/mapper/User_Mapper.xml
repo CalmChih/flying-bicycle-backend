@@ -51,4 +51,23 @@
         </set>
         WHERE id = #{id}
     </update>
+
+    <select id="getUserList" parameterType="hashmap" resultType="top.fallingintodreams.flying.bicycle.backend.vo.UserInfoVO">
+        SELECT u.id, a.username, u.nickname, u.gender, u.birthday, u.mobile, u.state, u.create_time
+        FROM user u
+                 INNER JOIN user_account a ON u.id = a.user_id
+        <where>
+            <if test="username != null and username != ''">
+                a.username = #{username}
+            </if>
+        </where>
+        ORDER BY u.create_time DESC
+    </select>
+
+    <update id="updateUserState">
+        UPDATE user
+        SET state = #{state}
+        WHERE id = #{userId}
+    </update>
+
 </mapper>

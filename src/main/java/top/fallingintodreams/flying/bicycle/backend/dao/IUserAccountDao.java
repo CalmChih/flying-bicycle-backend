@@ -4,6 +4,8 @@ import org.apache.ibatis.annotations.Mapper;
 import top.fallingintodreams.flying.bicycle.backend.dto.UserAccountDTO;
 import top.fallingintodreams.flying.bicycle.backend.po.UserAccount;
 
+import java.util.Map;
+
 /**
  * 用户账户表Dao
  *
@@ -23,14 +25,9 @@ public interface IUserAccountDao {
      * @param userAccountDTO 登录信息
      * @return 账户id
      */
-    String getPassword(UserAccountDTO userAccountDTO);
-
-    /**
-     * 是否存在账户
-     * @param userAccountDTO 登录信息
-     * @return
-     */
-    int getUserAccount(UserAccountDTO userAccountDTO);
+    UserAccount getPassword(UserAccountDTO userAccountDTO);
 
     void updatePassword(UserAccountDTO userAccountDTO);
+
+    void updateAccountState(Map<String, Object> searchMap);
 }

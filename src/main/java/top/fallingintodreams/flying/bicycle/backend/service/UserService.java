@@ -3,6 +3,8 @@ package top.fallingintodreams.flying.bicycle.backend.service;
 import top.fallingintodreams.flying.bicycle.backend.dto.UserAccountDTO;
 import top.fallingintodreams.flying.bicycle.backend.po.User;
 
+import java.util.Map;
+
 /**
  *
  * 用户信息 服务接口类
@@ -26,4 +28,8 @@ public interface UserService {
     User getUserInfo(String username);
 
     void updateUserInfo(User user);
+
+    Map<String, Object> getUserList(Map<String, Object> searchMap);
+
+    void updateUserState(Map<String, Object> searchMap);
 }

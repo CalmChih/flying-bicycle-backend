@@ -18,25 +18,22 @@
     </insert>
 
     <select id="getPassword" parameterType="top.fallingintodreams.flying.bicycle.backend.dto.UserAccountDTO"
-            resultType="string">
-        SELECT password
+            resultMap="userAccountMap">
+        SELECT password, state
         FROM user_account
         WHERE username = #{username}
-          and state = 1
-    </select>
-
-    <select id="getUserAccount" parameterType="top.fallingintodreams.flying.bicycle.backend.dto.UserAccountDTO"
-            resultType="int">
-        SELECT COUNT(*)
-        FROM user_account
-        WHERE username = #{username}
-          AND state = 1
     </select>
 
     <update id="updatePassword">
         UPDATE user_account
         SET password = #{password}
         WHERE username = #{username}
+    </update>
+
+    <update id="updateAccountState">
+        UPDATE user_account
+        SET state = #{state}
+        WHERE user_id = #{userId}
     </update>
 
 </mapper>

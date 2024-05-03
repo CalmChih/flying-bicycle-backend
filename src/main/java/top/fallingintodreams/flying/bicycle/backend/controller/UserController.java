@@ -18,6 +18,7 @@ import top.fallingintodreams.flying.bicycle.backend.service.UserService;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
@@ -59,5 +60,17 @@ public class UserController {
     public ApiResponse updatePassword(@RequestBody UserAccountDTO userAccountDTO) {
         userAccountService.updatePassword(userAccountDTO);
         return ApiResponse.success("更新成功");
+    }
+
+    @PostMapping("/getUserList")
+    public ApiResponse getUserList(@RequestBody Map<String, Object> searchMap) {
+        Map<String, Object> userList = userService.getUserList(searchMap);
+        return ApiResponse.success(userList);
+    }
+
+    @PostMapping("/updateUserState")
+    public ApiResponse updateUserState(@RequestBody Map<String, Object> searchMap) {
+        userService.updateUserState(searchMap);
+        return ApiResponse.success();
     }
 }

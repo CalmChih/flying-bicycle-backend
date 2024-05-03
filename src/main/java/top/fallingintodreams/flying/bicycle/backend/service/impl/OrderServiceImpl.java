@@ -21,6 +21,7 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Repository;
 import top.fallingintodreams.flying.bicycle.backend.common.ApiResponse;
 import top.fallingintodreams.flying.bicycle.backend.common.Constant;
+import top.fallingintodreams.flying.bicycle.backend.common.mq.RedisMqProducer;
 import top.fallingintodreams.flying.bicycle.backend.config.MyAlipayConfig;
 import top.fallingintodreams.flying.bicycle.backend.dao.IOrderDao;
 import top.fallingintodreams.flying.bicycle.backend.dto.OrderDTO;
@@ -39,6 +40,8 @@ import top.fallingintodreams.flying.bicycle.backend.vo.OrderTrendVO;
 
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,6 +73,8 @@ public class OrderServiceImpl implements OrderService {
     private RedisUtil redisUtil;
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
+    @Resource
+    private RedisMqProducer redisMqProducer;
 
     @Resource
     private MyAlipayConfig myAlipayConfig;
@@ -122,6 +127,8 @@ public class OrderServiceImpl implements OrderService {
         order.setReservationDays(orderDTO.getReservationDays());
         order.setTotalPrice(orderDTO.getTotalPrice());
         orderDao.insertOrder(order);
+        long epochMilli = LocalDateTime.now().plusMinutes(30).toInstant(ZoneOffset.UTC).toEpochMilli();
+        redisMqProducer.send(order.getOrderId(), epochMilli);
         return ApiResponse.success(order.getOrderId(), "下单成功");
     }
 

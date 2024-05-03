@@ -2,6 +2,10 @@ package top.fallingintodreams.flying.bicycle.backend.dao;
 
 import org.apache.ibatis.annotations.Mapper;
 import top.fallingintodreams.flying.bicycle.backend.po.User;
+import top.fallingintodreams.flying.bicycle.backend.vo.UserInfoVO;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * 用户信息表Dao
@@ -26,5 +30,9 @@ public interface IUserDao {
     User getUserInfo(String username);
 
     void updateUserInfo(User user);
+
+    List<UserInfoVO> getUserList(Map<String, Object> searchMap);
+
+    void updateUserState(Map<String, Object> searchMap);
 
 }

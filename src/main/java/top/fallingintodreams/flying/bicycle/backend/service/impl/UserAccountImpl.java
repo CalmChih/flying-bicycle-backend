@@ -9,10 +9,13 @@ import top.fallingintodreams.flying.bicycle.backend.dao.IUserAccountDao;
 import top.fallingintodreams.flying.bicycle.backend.dto.UserAccountDTO;
 import top.fallingintodreams.flying.bicycle.backend.handler.enums.impl.LoginEnum;
 import top.fallingintodreams.flying.bicycle.backend.handler.exception.LoginException;
+import top.fallingintodreams.flying.bicycle.backend.po.UserAccount;
 import top.fallingintodreams.flying.bicycle.backend.service.UserAccountService;
 import top.fallingintodreams.flying.bicycle.backend.service.UserService;
 import top.fallingintodreams.flying.bicycle.backend.util.RedisUtil;
 import top.fallingintodreams.flying.bicycle.backend.util.RegexUtil;
+
+import java.util.Objects;
 
 /**
  * 用户账户 服务实现类
@@ -37,11 +40,14 @@ public class UserAccountImpl implements UserAccountService {
         if (StringUtils.isBlank(userAccountDTO.getUsername()) || StringUtils.isBlank(userAccountDTO.getPassword())) {
             throw new LoginException(LoginEnum.WRONG_ACCOUNT_NUMBER_OR_PASSWORD);
         }
-        String password = userAccountDao.getPassword(userAccountDTO);
-        if (StringUtils.isBlank(password)) {
+        UserAccount userAccount = userAccountDao.getPassword(userAccountDTO);
+        if (Objects.isNull(userAccount)) {
             throw new LoginException(LoginEnum.USER_ACCOUNT_NOT_EXIST);
         }
-        boolean flag = BCrypt.checkpw(userAccountDTO.getPassword(), password);
+        if (2 == userAccount.getState()) {
+            throw new LoginException(LoginEnum.ACCOUNT_HAS_BENN_BINNED);
+        }
+        boolean flag = BCrypt.checkpw(userAccountDTO.getPassword(), userAccount.getPassword());
         if (!flag) {
             throw new LoginException(LoginEnum.WRONG_ACCOUNT_NUMBER_OR_PASSWORD);
         }
@@ -50,8 +56,8 @@ public class UserAccountImpl implements UserAccountService {
     @Override
     public void loginWithCaptcha(UserAccountDTO userAccountDTO) {
         checkCaptcha(userAccountDTO);
-        int count = userAccountDao.getUserAccount(userAccountDTO);
-        if (count == 0) {
+        UserAccount userAccount = userAccountDao.getPassword(userAccountDTO);
+        if (Objects.isNull(userAccount)) {
             userService.registerAccount(userAccountDTO);
         }
         redisUtil.del(Constant.RedisKey.CAPTCHA_KEY_PREFIX(userAccountDTO.getUsername()));

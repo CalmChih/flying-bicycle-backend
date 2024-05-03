@@ -29,7 +29,9 @@ public enum LoginEnum implements IBaseExceptionInfo {
      */
     CAPTCHA_SEND_ERROR("105", "验证码发送失败"),
     ACCOUNT_OR_PASSWORD_IS_BLANK("106", "账号或密码不能为空"),
-    ADMIN_ACCOUNT_NOT_EXITS("107", "账号不存在");
+    ADMIN_ACCOUNT_NOT_EXITS("107", "账号不存在"),
+    ACCOUNT_HAS_BENN_BINNED("108", "账号已被封禁");
+
 
     private final String errCode;
     private final String errMsg;

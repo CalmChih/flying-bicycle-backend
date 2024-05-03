@@ -428,6 +428,19 @@ public class RedisUtil {
             return 0;
         }
     }
+
+    //===============================zSet=================================
+    public void zSet(String key, Object value, double score) {
+        redisTemplate.opsForZSet().add(key, value, score);
+    }
+
+    public Set<Object> zRangeByScore(String key, double min, double max) {
+        return redisTemplate.opsForZSet().rangeByScore(key, min, max);
+    }
+
+    public void zRemove(String key, Object... values) {
+        redisTemplate.opsForZSet().remove(key, values);
+    }
     //===============================list=================================
 
     /**

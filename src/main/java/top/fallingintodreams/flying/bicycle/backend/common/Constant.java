@@ -22,6 +22,8 @@ public class Constant {
 
         public static final String CATEGORY_MAP_KEY = "category";
 
+        public static final String AUTO_CANCEL_ORDER_KEY = "cancelOrder";
+
         public static final String VALID_GOODS_LIST_PREFIX = "valid:goods:";
         public static String VALID_GOODS_LIST(String reservationStartTime, String reservationEndTime) {
             return VALID_GOODS_LIST_PREFIX + reservationStartTime + "to" + reservationEndTime;
@@ -116,16 +118,64 @@ public class Constant {
 
     }
 
-    public static final class UserState {
+    @Getter
+    public enum UserStateEnum {
 
         /**
          * 正常
          */
-        public static final int NORMAL = 1;
+        NORMAL(1, "正常"),
+        /**
+         * 封禁
+         */
+        FORBIDDEN(2, "封禁"),
         /**
          * 注销
          */
-        public static final int DEREGISTER = 0;
+        DEREGISTER(3, "注销");
+
+        private final int stateCode;
+        private final String stateValue;
+
+        UserStateEnum(int stateCode, String stateValue) {
+            this.stateCode = stateCode;
+            this.stateValue = stateValue;
+        }
+
+        private static final Map<Integer, String> userStateMap = new HashMap<>();
+        static {
+            userStateMap.put(NORMAL.getStateCode(), NORMAL.getStateValue());
+            userStateMap.put(FORBIDDEN.getStateCode(), FORBIDDEN.getStateValue());
+            userStateMap.put(DEREGISTER.getStateCode(), DEREGISTER.getStateValue());
+        }
+        public static String convert(Integer userStateCode) {
+            return userStateMap.get(userStateCode);
+        }
+
+    }
+
+    @Getter
+    public enum GenderEnum {
+        MAN(1, "男"),
+        WOMEN(0, "女");
+
+        private final int code;
+        private final String value;
+
+        GenderEnum(int code, String value) {
+            this.code = code;
+            this.value = value;
+        }
+
+        public static final Map<Integer, String> genderMap = new HashMap<>();
+        static {
+            genderMap.put(GenderEnum.MAN.getCode(), GenderEnum.MAN.getValue());
+            genderMap.put(GenderEnum.WOMEN.getCode(), GenderEnum.WOMEN.getValue());
+        }
+
+        public static String convert(Integer genderCode) {
+            return genderMap.get(genderCode);
+        }
 
     }
 
