@@ -149,6 +149,7 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderState(Constant.OrderStateEnum.CANCELLED.getStateCode());
         order.setOrderId(searchMap.get("orderId").toString());
         orderDao.updateOrder(order);
+        redisUtil.deleteKeysWithPrefix(Constant.RedisKey.VALID_GOODS_LIST_PREFIX);
         return ApiResponse.success();
     }
 

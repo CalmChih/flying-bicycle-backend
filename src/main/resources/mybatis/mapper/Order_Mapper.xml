@@ -91,6 +91,7 @@
         FROM `order`
         WHERE reservation_start_time &lt;= #{reservationEndTime}
           AND reservation_end_time &gt;= #{reservationStartTime}
+          AND order_state != 5
         GROUP BY goods_id
     </select>
 
