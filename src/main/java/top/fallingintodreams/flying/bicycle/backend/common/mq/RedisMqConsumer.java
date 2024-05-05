@@ -37,7 +37,6 @@ public class RedisMqConsumer {
     public void customer() {
         long epochMilli = LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli();
         Set<Object> orderIdSet = redisUtil.zRangeByScore(Constant.RedisKey.AUTO_CANCEL_ORDER_KEY, 0, epochMilli);
-        log.info("当前时间：{}", LocalDateTime.now().getSecond());
         List<CompletableFuture<Void>> futures = new ArrayList<>();
         orderIdSet.stream().map(Objects::toString).forEach(orderId -> {
             CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
@@ -47,8 +46,9 @@ public class RedisMqConsumer {
                     oder.setOrderState(Constant.OrderStateEnum.CANCELLED.getStateCode());
                     orderDao.updateOrder(oder);
                     redisUtil.zRemove(Constant.RedisKey.AUTO_CANCEL_ORDER_KEY, orderId);
+                    log.info("超时自动取消订单【{}】成功", orderId);
                 } catch (Exception e) {
-                    log.error("取消订单【{}】失败，错误信息：{}", orderId, e.getMessage());
+                    log.error("超时自动取消订单【{}】失败，错误信息：{}", orderId, e.getMessage());
                 }
             }, executor);
             futures.add(future);
