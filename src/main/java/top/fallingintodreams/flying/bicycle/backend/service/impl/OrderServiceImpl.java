@@ -145,11 +145,13 @@ public class OrderServiceImpl implements OrderService {
         if (!Constant.OrderStateEnum.UNPAID.getStateValue().equals(orderState) && nowDate.after(reservationStartTime)) {
             return ApiResponse.error("取消订单失败，当前时间已超过预约的租赁时间");
         }
+        String orderId = searchMap.get("orderId").toString();
         Order order = new Order();
         order.setOrderState(Constant.OrderStateEnum.CANCELLED.getStateCode());
-        order.setOrderId(searchMap.get("orderId").toString());
+        order.setOrderId(orderId);
         orderDao.updateOrder(order);
         redisUtil.deleteKeysWithPrefix(Constant.RedisKey.VALID_GOODS_LIST_PREFIX);
+        redisUtil.zRemove(Constant.RedisKey.AUTO_CANCEL_ORDER_KEY, orderId);
         return ApiResponse.success();
     }
 
