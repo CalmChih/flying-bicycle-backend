@@ -42,7 +42,6 @@ import top.fallingintodreams.flying.bicycle.backend.vo.OrderStateCountVO;
 import top.fallingintodreams.flying.bicycle.backend.vo.OrderTrendVO;
 
 import java.text.ParseException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -249,12 +248,11 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderTrendVO> getOrderTrend(Map<String, Object> searchMap) {
         String startTime = searchMap.get("startTime").toString();
         String endTime = searchMap.get("endTime").toString();
-        LocalDate localStartTime = LocalDate.parse(startTime);
-        LocalDate localEndTime = LocalDate.parse(endTime);
+        LocalDateTime localStartTime = LocalDateTime.parse(startTime);
+        LocalDateTime localEndTime = LocalDateTime.parse(endTime);
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         List<String> dateList = new ArrayList<>();
-        for (LocalDate currentDate = localStartTime; !currentDate.isAfter(localEndTime); currentDate = currentDate.plusDays(1)) {
-
+        for (LocalDateTime currentDate = localStartTime; !currentDate.isAfter(localEndTime); currentDate = currentDate.plusDays(1)) {
             dateList.add(currentDate.format(dateTimeFormatter));
         }
         List<OrderTrendVO> orderTrend = orderDao.getOrderTrend(searchMap);
@@ -331,6 +329,7 @@ public class OrderServiceImpl implements OrderService {
                     log.error("时间转换异常，orderId：{}，payTime：{}", outTradeNo, gmtPayment);
                 }
                 orderDao.updateOrder(order);
+                redisUtil.zRemove(Constant.RedisKey.AUTO_CANCEL_ORDER_KEY, outTradeNo);
             }
         }
     }
@@ -361,6 +360,7 @@ public class OrderServiceImpl implements OrderService {
                     order.setOrderId(orderId);
                     orderDao.updateOrder(order);
                 }
+                redisUtil.zRemove(Constant.RedisKey.AUTO_CANCEL_ORDER_KEY, orderId);
                 return ApiResponse.success("支付成功");
             } else {
                 return ApiResponse.error("您暂未成功支付，请及时支付");
