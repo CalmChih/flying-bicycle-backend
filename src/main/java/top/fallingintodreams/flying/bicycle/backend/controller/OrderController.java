@@ -102,4 +102,9 @@ public class OrderController {
         orderService.payCallback(httpServletRequest);
     }
 
+    @GetMapping("/getPayResult")
+    public ApiResponse getPayResult(@RequestParam String orderId) {
+        return orderService.getPayResult(orderId);
+    }
+
 }

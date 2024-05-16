@@ -4,9 +4,12 @@ import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.AlipayConfig;
 import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.domain.AlipayTradeQueryModel;
 import com.alipay.api.domain.AlipayTradeWapPayModel;
 import com.alipay.api.internal.util.AlipaySignature;
+import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.request.AlipayTradeWapPayRequest;
+import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.alipay.api.response.AlipayTradeWapPayResponse;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -289,7 +292,6 @@ public class OrderServiceImpl implements OrderService {
     private AlipayTradeWapPayRequest getAlipayTradeWapPayRequest(OrderGoodsVO orderGoodsVO) {
         AlipayTradeWapPayRequest request = new AlipayTradeWapPayRequest();
         request.setNotifyUrl(myAlipayConfig.getNotifyUrl());
-        request.setReturnUrl("http://localhost:8026/user");
         AlipayTradeWapPayModel model = new AlipayTradeWapPayModel();
         model.setOutTradeNo(orderGoodsVO.getOrderId());
         model.setTotalAmount(orderGoodsVO.getTotalPrice().toString());
@@ -333,4 +335,51 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @Override
+    public ApiResponse getPayResult(String orderId) {
+        AlipayTradeQueryResponse response = null;
+        try {
+            response = getAlipayTradeQueryResponse(orderId);
+            if (!response.isSuccess()) {
+                for (int i = 0; i < 3; i++) {
+                    response = getAlipayTradeQueryResponse(orderId);
+                    if (response.isSuccess()) {
+                        break;
+                    }
+                }
+            }
+        } catch (AlipayApiException e) {
+            throw new RuntimeException(e);
+        }
+        if (response.isSuccess()) {
+            if (Objects.equals("TRADE_SUCCESS", response.getTradeStatus())) {
+                // 支付成功
+                OrderGoodsVO orderInfo = orderDao.getOrderInfo(orderId);
+                if (!Objects.equals(orderInfo.getOrderState(), Constant.OrderStateEnum.PAID.getStateCode())) {
+                    Order order = new Order();
+                    order.setOrderState(Constant.OrderStateEnum.PAID.getStateCode());
+                    order.setOrderId(orderId);
+                    orderDao.updateOrder(order);
+                }
+                return ApiResponse.success("支付成功");
+            } else {
+                return ApiResponse.error("您暂未成功支付，请及时支付");
+            }
+        }
+        return ApiResponse.error("支付宝接口调用异常");
+    }
+
+    private AlipayTradeQueryResponse getAlipayTradeQueryResponse(String orderId) throws AlipayApiException {
+        AlipayClient alipayClient = new DefaultAlipayClient(alipayConfig);
+        AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
+        AlipayTradeQueryModel model = new AlipayTradeQueryModel();
+        // 设置订单支付时传入的商户订单号
+        model.setOutTradeNo(orderId);
+        // 设置查询选项
+        List<String> queryOptions = new ArrayList<String>();
+        queryOptions.add("trade_settle_info");
+        model.setQueryOptions(queryOptions);
+        request.setBizModel(model);
+        return alipayClient.execute(request);
+    }
 }

@@ -61,4 +61,7 @@ public interface OrderService {
     String payOrder(String orderId);
 
     void payCallback(HttpServletRequest request);
+
+    ApiResponse getPayResult(String orderId);
+
 }
