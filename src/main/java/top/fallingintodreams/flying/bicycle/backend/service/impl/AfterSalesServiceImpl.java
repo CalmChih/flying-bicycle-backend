@@ -22,6 +22,7 @@ import top.fallingintodreams.flying.bicycle.backend.common.Constant;
 import top.fallingintodreams.flying.bicycle.backend.dao.IAfterSalesDao;
 import top.fallingintodreams.flying.bicycle.backend.dao.IOrderDao;
 import top.fallingintodreams.flying.bicycle.backend.dto.AfterSalesDTO;
+import top.fallingintodreams.flying.bicycle.backend.handler.exception.BusinessException;
 import top.fallingintodreams.flying.bicycle.backend.po.AfterSales;
 import top.fallingintodreams.flying.bicycle.backend.po.Order;
 import top.fallingintodreams.flying.bicycle.backend.service.AfterSalesService;
@@ -92,7 +93,7 @@ public class AfterSalesServiceImpl implements AfterSalesService {
                 }
             }
             if (!isRefunded) {
-                throw new AlipayApiException("退款失败，调用支付宝退款接口异常");
+                throw new BusinessException("退款失败");
             }
             afterSales.setState(Constant.AfterSalesStateEnum.AFTER_SALES_SUCCESS.getStateCode());
             updateOrderState(afterSales.getOrderId(), Constant.OrderStateEnum.REFUNDED);
@@ -106,6 +107,7 @@ public class AfterSalesServiceImpl implements AfterSalesService {
         AlipayTradeRefundModel model = new AlipayTradeRefundModel();
         model.setOutTradeNo(orderId);
         model.setRefundAmount(refundAmount);
+        model.setOutRequestNo(orderId);
         request.setBizModel(model);
         AlipayTradeRefundResponse response = alipayClient.execute(request);
         if (response.isSuccess()) {
@@ -131,6 +133,7 @@ public class AfterSalesServiceImpl implements AfterSalesService {
         AlipayTradeFastpayRefundQueryRequest request = new AlipayTradeFastpayRefundQueryRequest();
         AlipayTradeFastpayRefundQueryModel model = new AlipayTradeFastpayRefundQueryModel();
         model.setOutTradeNo(orderId);
+        model.setOutRequestNo(orderId);
         model.setOutRequestNo(orderId);
         request.setBizModel(model);
         AlipayTradeFastpayRefundQueryResponse response = alipayClient.execute(request);

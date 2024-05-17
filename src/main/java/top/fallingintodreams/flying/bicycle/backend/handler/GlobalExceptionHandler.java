@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import top.fallingintodreams.flying.bicycle.backend.common.ApiResponse;
 import top.fallingintodreams.flying.bicycle.backend.common.Constant;
+import top.fallingintodreams.flying.bicycle.backend.handler.exception.BusinessException;
 import top.fallingintodreams.flying.bicycle.backend.handler.exception.LoginException;
 
 /**
@@ -44,6 +45,12 @@ public class GlobalExceptionHandler {
         log.error("没有该资源", e);
         return ApiResponse.error(Constant.ResponseCodeEnum.PATH_ERROR.getCode(),
                 Constant.ResponseCodeEnum.PATH_ERROR.getMsg());
+    }
+
+    @ExceptionHandler(BusinessException.class)
+    public ApiResponse businessException(BusinessException e) {
+        log.error("业务异常", e);
+        return ApiResponse.error(e.getMessage());
     }
 
     @ExceptionHandler(AlipayApiException.class)
