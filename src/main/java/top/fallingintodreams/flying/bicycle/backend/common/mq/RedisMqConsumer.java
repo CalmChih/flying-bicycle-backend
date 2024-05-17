@@ -4,6 +4,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import top.fallingintodreams.flying.bicycle.backend.common.Constant;
 import top.fallingintodreams.flying.bicycle.backend.dao.IOrderDao;
 import top.fallingintodreams.flying.bicycle.backend.po.Order;
@@ -37,6 +38,9 @@ public class RedisMqConsumer {
     public void customer() {
         long epochMilli = LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli();
         Set<Object> orderIdSet = redisUtil.zRangeByScore(Constant.RedisKey.AUTO_CANCEL_ORDER_KEY, 0, epochMilli);
+        if (CollectionUtils.isEmpty(orderIdSet)) {
+            return;
+        }
         List<CompletableFuture<Void>> futures = new ArrayList<>();
         orderIdSet.stream().map(Objects::toString).forEach(orderId -> {
             CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
@@ -54,5 +58,6 @@ public class RedisMqConsumer {
             futures.add(future);
         });
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+        redisUtil.deleteKeysWithPrefix(Constant.RedisKey.VALID_GOODS_LIST_PREFIX);
     }
 }

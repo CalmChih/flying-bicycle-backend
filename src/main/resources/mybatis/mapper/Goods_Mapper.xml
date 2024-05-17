@@ -88,6 +88,7 @@
                 #{goodsId, jdbcType=BIGINT}
             </foreach>
         </if>
+        ORDER BY create_time DESC
     </select>
 
     <select id="getGoodsByTag" parameterType="string" resultMap="goodsMap">

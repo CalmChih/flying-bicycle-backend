@@ -3,12 +3,14 @@ package top.fallingintodreams.flying.bicycle.backend.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import top.fallingintodreams.flying.bicycle.backend.common.Constant;
 import top.fallingintodreams.flying.bicycle.backend.dao.IGoodsDao;
 import top.fallingintodreams.flying.bicycle.backend.dao.IOrderDao;
 import top.fallingintodreams.flying.bicycle.backend.dto.GoodsDTO;
+import top.fallingintodreams.flying.bicycle.backend.handler.exception.BusinessException;
 import top.fallingintodreams.flying.bicycle.backend.po.Goods;
 import top.fallingintodreams.flying.bicycle.backend.service.CategorizationService;
 import top.fallingintodreams.flying.bicycle.backend.service.GoodsService;
@@ -31,6 +33,7 @@ import java.util.stream.Collectors;
  * @author Chih
  * @date 2024/2/29 22:05
  */
+@Slf4j
 @Service
 public class GoodsServiceImpl implements GoodsService {
 
@@ -112,8 +115,10 @@ public class GoodsServiceImpl implements GoodsService {
 
     @Override
     public List<Goods> getValidGoodsList(Map<String, Object> searchMap) {
-        String hMapKey = Constant.RedisKey.VALID_GOODS_LIST(searchMap.get("reservationStartTime").toString(),
-                searchMap.get("reservationEndTime").toString());
+        String startTime = searchMap.get("reservationStartTime").toString();
+        String endTime = searchMap.get("reservationEndTime").toString();
+        String hMapKey = Constant.RedisKey.VALID_GOODS_LIST(startTime,
+                endTime);
         List<Goods> normalGoodsList = new ArrayList<>();
         if (redisUtil.hasKey(hMapKey)) {
             Map<Object, Object> validGoodsMap = redisUtil.hmget(hMapKey);
@@ -121,8 +126,14 @@ public class GoodsServiceImpl implements GoodsService {
             searchMap.put("goodsIds", goodsIds);
             normalGoodsList = goodsDao.getNormalGoodsList(searchMap);
         } else {
-            normalGoodsList = goodsDao.getNormalGoodsList(searchMap);
-            List<ReservationGoodsVO> reservationGoodsNum = orderDao.getReservationGoodsNum(searchMap);
+            tryLock(startTime, endTime);
+            List<ReservationGoodsVO> reservationGoodsNum;
+            try {
+                normalGoodsList = goodsDao.getNormalGoodsList(searchMap);
+                reservationGoodsNum = orderDao.getReservationGoodsNum(searchMap);
+            } finally {
+                unLock(startTime, endTime);
+            }
             Map<Long, Integer> goodsIdMap = reservationGoodsNum.stream().collect(
                     Collectors.toMap(ReservationGoodsVO::getGoodsId, ReservationGoodsVO::getNum));
             normalGoodsList = normalGoodsList.stream().filter(goods -> {
@@ -140,9 +151,10 @@ public class GoodsServiceImpl implements GoodsService {
                 validGoodsMap.put(goods.getGoodsId().toString(), goods.getGoodsNum());
             }
             long seconds = getExpireTime(searchMap);
-            if (!redisUtil.hasKey(hMapKey)) {
-                redisUtil.hmset(hMapKey, validGoodsMap, seconds);
+            if (redisUtil.hasKey(hMapKey)) {
+                redisUtil.del(hMapKey);
             }
+            redisUtil.hmset(hMapKey, validGoodsMap, seconds);
         }
         if (searchMap.get("categoryId") != null) {
             normalGoodsList = normalGoodsList.stream()
@@ -150,6 +162,28 @@ public class GoodsServiceImpl implements GoodsService {
                     .toList();
         }
         return normalGoodsList;
+    }
+
+    private void unLock(String startTime, String endTime) {
+        redisUtil.del(Constant.RedisKey.LOCK_KEY(startTime, endTime));
+    }
+
+    private void tryLock(String startTime, String endTime) {
+        boolean isLock = redisUtil.setNx(Constant.RedisKey.LOCK_KEY(startTime, endTime), 30L);
+        if (!isLock) {
+            for (int i = 0; i < 3; i++) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    log.error("睡眠失败");
+                }
+                isLock = redisUtil.setNx(Constant.RedisKey.LOCK_KEY(startTime, endTime), 30L);
+                if (isLock) {
+                    return;
+                }
+            }
+            throw new BusinessException("请稍后再试");
+        }
     }
 
     private long getExpireTime(Map<String, Object> searchMap) {

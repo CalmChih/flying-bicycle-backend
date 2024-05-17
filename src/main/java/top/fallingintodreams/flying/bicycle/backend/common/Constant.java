@@ -29,6 +29,12 @@ public class Constant {
             return VALID_GOODS_LIST_PREFIX + reservationStartTime + "to" + reservationEndTime;
         }
 
+        public static final String LOCK_PREFIX_KEY = "lock:";
+
+        public static String LOCK_KEY(String reservationStartTime, String reservationEndTime) {
+            return LOCK_PREFIX_KEY + reservationStartTime + "to" + reservationEndTime;
+        }
+
     }
 
     @Getter
